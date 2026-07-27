@@ -1,18 +1,20 @@
 # Dependencies
-**/node_modules
+client/node_modules/
+server/node_modules/
 
-# Environment Variables
-**/.env
+# Environment files
+server/.env
+client/.env
 
 # Build folders
-client/dist
-server/dist
-build
+client/dist/
+server/dist/
 
 # Logs
 *.log
+npm-debug.log*
 
-# VS Code (optional)
+# Editor
 .vscode/
 
 # OS

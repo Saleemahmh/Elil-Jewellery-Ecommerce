@@ -1,13 +1,45 @@
+import { createUser, loginUser } from "../services/auth.service.js";
+import { generateToken } from "../utils/jwt.js";
+import { sendAuthResponse } from "../utils/authResponse.js";
+
 export const registerUser = async (req, res) => {
   try {
-    res.status(200).json({
-      success: true,
-      message: "Register Controller Working",
+    const { fullName, email, password } = req.body;
+    const user = await createUser({
+      fullName,
+      email,
+      password,
     });
+    sendAuthResponse(res, user, 201, "User registered successfully");
   } catch (error) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
       message: error.message,
     });
   }
+};
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await loginUser({
+      email,
+      password,
+    });
+
+    sendAuthResponse(res, user, 200, "Login successfully");
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+export const getCurrentUser = async (req, res) => {
+  const { password, ...userData } = req.user.toObject();
+
+  res.status(200).json({
+    success: true,
+    user: userData,
+  });
 };
