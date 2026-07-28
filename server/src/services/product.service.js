@@ -13,14 +13,12 @@ export const createProduct = async (productData) => {
 //get all products
 
 export const getAllProducts = async () => {
-  return await Product.find().populate("category").populate("collections");
+  return await Product.find().populate("category");
 };
 
 //get product id
 export const getProductById = async (id) => {
-  const product = await Product.findById(id)
-    .populate("category")
-    .populate("collections");
+  const product = await Product.findById(id).populate("category");
   if (!product) {
     throw new Error("Product not found");
   }
