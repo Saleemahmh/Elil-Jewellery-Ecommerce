@@ -4,6 +4,7 @@ import {
   registerUser,
   login,
   getCurrentUser,
+  logout,
 } from "../controller/auth.controller.js";
 import {
   registerValidation,
@@ -20,4 +21,8 @@ router.post("/login", loginValidation, validate, login);
 router.get("/test", (req, res) => {
   res.send("Auth Route Working");
 });
+//logout
+router.get("/me", protect, getCurrentUser);
+
+router.post("/logout", logout);
 export default router;
