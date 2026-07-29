@@ -22,7 +22,7 @@ export const getProductById = async (id) => {
   if (!product) {
     throw new Error("Product not found");
   }
-  return getAllProducts;
+  return product;
 };
 
 //update product

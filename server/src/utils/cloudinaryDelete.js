@@ -1,0 +1,7 @@
+import cloudinary from "../config/cloudinary.js";
+
+export const deleteFromCloudinary = async (publicId) => {
+  if (!publicId) return;
+
+  return await cloudinary.uploader.destroy(publicId);
+};

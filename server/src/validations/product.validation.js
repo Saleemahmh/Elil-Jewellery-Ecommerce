@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 export const createProductValidation = [
   body("name").trim().notEmpty().withMessage("Product name is required"),
@@ -54,6 +54,8 @@ export const createProductValidation = [
     .withMessage("Status must be either active or inactive"),
 ];
 export const updateProductValidation = [
+  param("id").isMongoId().withMessage("Invalid Product ID"),
+
   body("name")
     .optional()
     .trim()

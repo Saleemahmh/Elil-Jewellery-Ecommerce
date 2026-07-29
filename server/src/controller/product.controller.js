@@ -1,4 +1,6 @@
 import slugify from "slugify";
+import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
+import { deleteFromCloudinary } from "../utils/cloudinaryDelete.js";
 
 import {
   createProduct as createProductService,
@@ -10,8 +12,17 @@ import {
 
 export const createProduct = async (req, res) => {
   try {
+    let uploadedImages = [];
+    if (req.files && req.files.length > 0) {
+      uploadedImages = await Promise.all(
+        req.files.map((file) =>
+          uploadToCloudinary(file.buffer, "elil/products"),
+        ),
+      );
+    }
     const productData = {
       ...req.body,
+      images: uploadedImages,
       slug: slugify(req.body.name, {
         lower: true,
         strict: true,
@@ -67,6 +78,25 @@ export const getProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
+    let uploadedImages = [];
+    const existingProduct = await getProductByIdService(req.params.id);
+
+    // Upload new images if provided
+    if (req.files && req.files.length > 0) {
+      // delete old cloudinary images
+      if (existingProduct.images && existingProduct.images.length > 0) {
+        await Promise.all(
+          existingProduct.images.map((image) =>
+            deleteFromCloudinary(image.public_id),
+          ),
+        );
+      }
+      uploadedImages = await Promise.all(
+        req.files.map((file) =>
+          uploadToCloudinary(file.buffer, "elil/products"),
+        ),
+      );
+    }
     const updateData = {
       ...req.body,
     };
@@ -77,9 +107,13 @@ export const updateProduct = async (req, res) => {
         strict: true,
       });
     }
-
+    if (uploadedImages.length > 0) {
+      updateData.images = uploadedImages;
+    }
     const product = await updateProductService(req.params.id, updateData);
-
+    console.log("req.body:", req.body);
+    console.log("updateData:", updateData);
+    console.log(product);
     return res.status(200).json({
       success: true,
       product,
@@ -94,6 +128,17 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
+    //fetch product
+    const existingProduct = await getProductByIdService(req.params.id);
+    //delete cloudinary images
+    if (existingProduct.images && existingProduct.images.length > 0) {
+      await Promise.all(
+        existingProduct.images.map((image) =>
+          deleteFromCloudinary(image.public_id),
+        ),
+      );
+    }
+
     await deleteProductService(req.params.id);
 
     return res.status(200).json({
