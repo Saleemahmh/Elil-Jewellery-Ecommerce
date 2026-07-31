@@ -1,4 +1,5 @@
 import Product from "../models/product.js";
+import Wishlist from "../models/wishlist.js";
 
 export const createProduct = async (productData) => {
   const existingProduct = await Product.findOne({
@@ -12,7 +13,7 @@ export const createProduct = async (productData) => {
 };
 //get all products
 
-export const getAllProducts = async (queryParams) => {
+export const getAllProducts = async (queryParams, userId = null) => {
   //search and filter
   const {
     search,
@@ -99,9 +100,19 @@ export const getAllProducts = async (queryParams) => {
     .sort(sortOption)
     .skip(skip)
     .limit(Number(limit));
-
+  let wishlistIds = [];
+  if (userId) {
+    const wishlist = await Wishlist.findOne({ user: userId });
+    if (wishlist) {
+      wishlistIds = wishlist.products.map((id) => id.toString());
+    }
+  }
+  const updatedProducts = products.map((product) => ({
+    ...product.toObject(),
+    isWishlisted: wishlistIds.includes(product._id.toString()),
+  }));
   return {
-    products,
+    products: updatedProducts,
     totalProducts,
     currentPage: Number(page),
     totalPages: Math.ceil(totalProducts / Number(limit)),

@@ -45,7 +45,7 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const result = await getAllProductsService(req.query);
+    const result = await getAllProductsService(req.query, req.user?._id);
 
     return res.status(200).json({
       success: true,

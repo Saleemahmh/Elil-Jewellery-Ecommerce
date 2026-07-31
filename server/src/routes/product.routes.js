@@ -16,6 +16,7 @@ import {
 import validateRequest from "../middleware/validateRequest.middleware.js";
 import protect from "../middleware/auth.middleware.js";
 import authorize from "../middleware/role.middleware.js";
+import protectOptional from "../middleware/protectOptional.middleware.js";
 
 const router = express.Router();
 
@@ -29,7 +30,7 @@ router.post(
   createProduct,
 );
 
-router.get("/", getProducts);
+router.get("/", protectOptional, getProducts);
 
 router.get("/:id", getProduct);
 
