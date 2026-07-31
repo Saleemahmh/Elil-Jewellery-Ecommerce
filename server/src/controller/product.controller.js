@@ -45,12 +45,15 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await getAllProductsService();
+    const result = await getAllProductsService(req.query);
 
     return res.status(200).json({
       success: true,
-      count: products.length,
-      products,
+      count: result.products.length,
+      totalProducts: result.totalProducts,
+      currentPage: result.currentPage,
+      totalPages: result.totalPages,
+      products: result.products,
     });
   } catch (error) {
     return res.status(500).json({

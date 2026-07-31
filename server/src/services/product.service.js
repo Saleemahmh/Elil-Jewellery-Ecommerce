@@ -12,8 +12,100 @@ export const createProduct = async (productData) => {
 };
 //get all products
 
-export const getAllProducts = async () => {
-  return await Product.find().populate("category");
+export const getAllProducts = async (queryParams) => {
+  //search and filter
+  const {
+    search,
+    category,
+    featured,
+    bestSeller,
+    newArrival,
+    minPrice,
+    maxPrice,
+    sort,
+    page = 1,
+    limit = 10,
+  } = queryParams;
+  const skip = (Number(page) - 1) * Number(limit);
+  const filter = {};
+  //search
+  if (search) {
+    filter.name = {
+      $regex: search,
+      $options: "i",
+    };
+  }
+  //category
+
+  if (category) {
+    filter.category = category;
+  }
+  //featured
+
+  if (featured !== undefined) {
+    filter.featured = featured === "true";
+  }
+  //best seller
+  if (bestSeller !== undefined) {
+    filter.bestSeller = bestSeller === "true";
+  }
+  //new arrival
+
+  if (newArrival !== undefined) {
+    filter.newArrival = newArrival === "true";
+  }
+
+  //price filter
+
+  if (minPrice || maxPrice) {
+    filter.price = {};
+
+    if (minPrice) {
+      filter.price.$lte = Number(minPrice);
+    }
+    if (maxPrice) {
+      filter.price.$lte = Number(maxPrice);
+    }
+  }
+  let sortOption = { createdAt: -1 }; // Default: newest first
+
+  switch (sort) {
+    case "oldest":
+      sortOption = { createdAt: 1 };
+      break;
+
+    case "price-asc":
+      sortOption = { price: 1 };
+      break;
+
+    case "price-desc":
+      sortOption = { price: -1 };
+      break;
+
+    case "name-asc":
+      sortOption = { name: 1 };
+      break;
+
+    case "name-desc":
+      sortOption = { name: -1 };
+      break;
+
+    default:
+      sortOption = { createdAt: -1 };
+  }
+  const totalProducts = await Product.countDocuments(filter);
+  const products = await Product.find(filter)
+    .populate("category")
+    .sort(sortOption)
+    .skip(skip)
+    .limit(Number(limit));
+
+  return {
+    products,
+    totalProducts,
+    currentPage: Number(page),
+    totalPages: Math.ceil(totalProducts / Number(limit)),
+  };
 };
 
 //get product id
