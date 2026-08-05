@@ -31,3 +31,20 @@ h6 {
 button {
   cursor: pointer;
 }
+.swiper-pagination {
+  margin-top: 2rem;
+  position: relative;
+}
+
+.swiper-pagination-bullet {
+  background: rgba(255,255,255,0.4);
+  width: 10px;
+  height: 10px;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #C7A05A;
+  width: 28px;
+  border-radius: 999px;
+}
