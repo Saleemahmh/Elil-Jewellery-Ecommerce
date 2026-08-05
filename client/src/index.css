@@ -48,3 +48,16 @@ button {
   width: 28px;
   border-radius: 999px;
 }
+@keyframes breathe {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.06);
+  }
+}
+
+.breathe {
+  animation: breathe 8s ease-in-out infinite alternate;
+}

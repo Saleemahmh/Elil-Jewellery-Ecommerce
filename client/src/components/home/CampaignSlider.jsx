@@ -46,10 +46,8 @@ const CampaignImage = ({ campaign }) => {
       src={campaign.image}
       alt={campaign.title}
       onError={() => setFailed(true)}
-      initial={{ scale: 1.08 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 6, ease: "easeOut" }}
-      className="w-full h-[520px] lg:h-[640px] object-cover"
+      
+      className="w-full h-[520px] lg:h-[640px] object-cover breathe"
     />
   );
 };
@@ -83,7 +81,7 @@ const CampaignSlider = () => {
             className="max-w-md"
           >
             <p className="uppercase tracking-[0.35em] text-[#C7A05A] text-sm font-medium">
-              Editorial Collection
+              Signature Collection
             </p>
 
             <h2 className="mt-5 font-[Cinzel] text-[#4A294B] text-4xl md:text-5xl leading-tight">
