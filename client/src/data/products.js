@@ -10,6 +10,7 @@ export const products = [
     slug: "diamond-solitaire-ring",
     category: "Rings",
     price: 24999,
+    featured: true,
     image: ring,
   },
   {
@@ -18,6 +19,7 @@ export const products = [
     slug: "pearl-necklace",
     category: "Necklaces",
     price: 31999,
+    featured: false,
     image: necklace,
   },
   {
@@ -26,6 +28,7 @@ export const products = [
     slug: "rose-gold-bracelet",
     category: "Bracelets",
     price: 18999,
+    featured: true,
     image: bracelet,
   },
   {
@@ -34,6 +37,7 @@ export const products = [
     slug: "emerald-earrings",
     category: "Earrings",
     price: 15999,
+    featured: true,
     image: earrings,
   },
 ];

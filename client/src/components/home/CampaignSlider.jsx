@@ -68,7 +68,7 @@ const CampaignSlider = () => {
   }
 
   return (
-    <section className="bg-[#F7F2EB] py-20 lg:py-28 overflow-hidden">
+    <section className="bg-[#F7F2EB] py-6 lg:py-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className="grid lg:grid-cols-[420px_1fr] gap-12 xl:gap-20 items-center">
           {/* ================= LEFT ================= */}

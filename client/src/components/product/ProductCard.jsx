@@ -105,6 +105,8 @@ const ProductCard = ({ product }) => {
               hover:text-[#5F2147]
               transition-colors
               duration-300
+              h-[58px]
+    flex items-start
               line-clamp-2
             "
           >

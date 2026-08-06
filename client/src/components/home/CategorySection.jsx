@@ -4,7 +4,7 @@ import { categories } from "../../data/categories.js";
 
 const CategorySection = () => {
   return (
-    <section className="py-24 bg-[#F7F2EB]">
+    <section className="py-10 bg-[#F7F2EB]">
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
