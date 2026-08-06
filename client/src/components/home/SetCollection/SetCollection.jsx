@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 import Button from "../../common/Button";
+import SectionDivider from "../../common/SectionDivider.jsx";
 
 import { emeraldSet } from "../../../data/sets.js";
 
@@ -16,7 +17,7 @@ const SetCollection = () => {
 
   return (
 
-    <section className="bg-[#341A36] py-8 lg:py-10">
+    <section className="relative bg-[#341A36] mt-5 py-4 lg:py-5">
 
       <div className="max-w-6xl mx-auto px-12 lg:px-6">
 
@@ -74,6 +75,8 @@ const SetCollection = () => {
         </div>
 
       </div>
+
+      <SectionDivider />
 
     </section>
 

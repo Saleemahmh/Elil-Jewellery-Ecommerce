@@ -1,6 +1,20 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectFade, Autoplay, Pagination } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/pagination";
+
 import Button from "../common/Button.jsx";
-import heroImage from "../../assets/images/hero/hero_1.jpg";
+
+import hero1 from "../../assets/images/hero/hero_1.jpg";
+import hero2 from "../../assets/images/hero/hero_2.jpg";
+import hero3 from "../../assets/images/hero/hero_3.jpg";
+
+const heroImages = [hero1, hero2, hero3];
 
 const Hero = () => {
   return (
@@ -34,7 +48,7 @@ const Hero = () => {
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-[Cinzel] text-5xl md:text-6xl xl:text-7xl text-white leading-tight"
+            className="font-[Cinzel] text-6xl md:text-7xl xl:text-8xl text-white leading-[0.95]"
           >
             Timeless
             <br />
@@ -74,30 +88,58 @@ const Hero = () => {
           initial={{ opacity: 0, x: 80 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1 }}
-          className="flex-1 relative"
+          className="flex-1 relative w-full"
         >
           {/* Gold Glow */}
-
-          {/* Gold Glow */}
-
           <div className="absolute -top-12 -right-10 w-72 h-72 rounded-full bg-[#C7A05A]/20 blur-[100px]"></div>
 
           {/* Plum Glow */}
-
           <div className="absolute -bottom-12 -left-10 w-72 h-72 rounded-full bg-[#7B5A7C]/20 blur-[120px]"></div>
 
-          <motion.img
-            animate={{
-              scale: [1, 1.02, 1],
+          <Swiper
+            modules={[EffectFade, Autoplay, Pagination]}
+            effect="fade"
+            speed={1000}
+            autoplay={{ delay: 4500, disableOnInteraction: false }}
+            pagination={{
+              clickable: true,
+              bulletClass: "hero-bullet",
+              bulletActiveClass: "hero-bullet-active",
             }}
-            transition={{
-              repeat: Infinity,
-              duration: 7,
-            }}
-            src={heroImage}
-            alt="Luxury Jewellery"
-            className="relative rounded-3xl shadow-2xl w-full object-cover"
-          />
+            className="relative rounded-3xl shadow-2xl"
+          >
+            {heroImages.map((src, index) => (
+              <SwiperSlide key={index}>
+                <motion.img
+                  animate={{ scale: [1, 1.02, 1] }}
+                  transition={{ repeat: Infinity, duration: 7 }}
+                  src={src}
+                  alt="Luxury Jewellery"
+                  className="w-full h-[420px] md:h-[520px] object-cover"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          {/* Pagination dot styling — scoped so it doesn't leak into
+              other Swiper instances (e.g. the campaign slider) */}
+          <style>{`
+            .hero-bullet {
+              width: 8px;
+              height: 8px;
+              display: inline-block;
+              border-radius: 9999px;
+              background: rgba(255, 255, 255, 0.4);
+              margin: 0 4px !important;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            }
+            .hero-bullet-active {
+              background: #C7A05A;
+              width: 22px;
+              border-radius: 9999px;
+            }
+          `}</style>
         </motion.div>
       </div>
     </section>
