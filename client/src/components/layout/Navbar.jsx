@@ -1,4 +1,4 @@
-import { Link} from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import {
   FiSearch,
   FiHeart,
@@ -8,6 +8,13 @@ import {
 
 import Container from "../common/Container";
 import logo from "../../assets/logo/Logo-revised_v1.png";
+
+const navLinks = [
+  { name: "Home", path: "/" },
+  { name: "Shop", path: "/shop" },
+  { name: "Collections", path: "/collections" },
+  { name: "About", path: "/about" },
+];
 
 const Navbar = () => {
   return (
@@ -26,14 +33,28 @@ const Navbar = () => {
 
           {/* Navigation */}
           <ul className="hidden lg:flex items-center gap-10">
-            {["Home", "Shop", "Collections", "About"].map((item) => (
-              <li key={item}>
-                <Link
-                  to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                  className="font-[Cinzel] tracking-wide text-[15px] text-[#4A294B] hover:text-[#C7A05A] transition-colors duration-300"
+            {navLinks.map((item) => (
+              <li key={item.name}>
+                <NavLink
+                  to={item.path}
+                  end={item.path === "/"}
+                  className={({ isActive }) =>
+                    `
+                    font-[Cinzel]
+                    tracking-wide
+                    text-[15px]
+                    transition-colors
+                    duration-300
+                    ${
+                      isActive
+                        ? "text-[#C7A05A]"
+                        : "text-[#4A294B] hover:text-[#C7A05A]"
+                    }
+                    `
+                  }
                 >
-                  {item}
-                </Link>
+                  {item.name}
+                </NavLink>
               </li>
             ))}
           </ul>

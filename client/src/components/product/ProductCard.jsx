@@ -17,7 +17,7 @@ const ProductCard = ({ product }) => {
         <Link to={`/product/${product.slug}`}>
 
           <motion.img
-            src={product.image}
+            src={product.images?.[0]?.url || product.image}
             alt={product.name}
             whileHover={{
               scale: 1.05,
