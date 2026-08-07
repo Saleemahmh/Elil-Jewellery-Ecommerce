@@ -25,7 +25,7 @@ const SectionTitle = ({
         </span>
       )}
 
-      <h2 className="font-[Cinzel] text-[#4A294B] text-3xl md:text-4xl lg:text-5xl leading-tight">
+      <h2 className="font-[Cinzel] text-[#4A294B] text-3xl md:text-4xl lg:text-4xl leading-tight">
         {title}
       </h2>
 

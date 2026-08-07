@@ -9,6 +9,7 @@ import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
 import Button from "../common/Button.jsx";
+import SectionDivider from "../common/SectionDivider.jsx";
 
 import hero1 from "../../assets/images/hero/hero_1.jpg";
 import hero2 from "../../assets/images/hero/hero_2.jpg";
@@ -142,6 +143,8 @@ const Hero = () => {
           `}</style>
         </motion.div>
       </div>
+
+      <SectionDivider />
     </section>
   );
 };
