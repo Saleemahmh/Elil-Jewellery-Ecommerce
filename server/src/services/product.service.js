@@ -62,7 +62,7 @@ export const getAllProducts = async (queryParams, userId = null) => {
     filter.price = {};
 
     if (minPrice) {
-      filter.price.$lte = Number(minPrice);
+      filter.price.$gte = Number(minPrice);
     }
     if (maxPrice) {
       filter.price.$lte = Number(maxPrice);

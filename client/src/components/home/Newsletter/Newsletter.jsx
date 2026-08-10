@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 
-import newsletterImage from "../../../assets/images/images/pexels-hawraz-arts-353575904-18362791.jpg";
+import newsletterImage from "../../../assets/images/images/ring_2.jpg";
 
 /**
  * Full-bleed background photo with a plum gradient overlay, matching
