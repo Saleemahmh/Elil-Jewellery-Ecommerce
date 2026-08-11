@@ -23,6 +23,7 @@ export const getAllProducts = async (queryParams, userId = null) => {
     newArrival,
     minPrice,
     maxPrice,
+    availability,
     sort,
     page = 1,
     limit = 10,
@@ -67,6 +68,16 @@ export const getAllProducts = async (queryParams, userId = null) => {
     if (maxPrice) {
       filter.price.$lte = Number(maxPrice);
     }
+  }
+
+  //in stock
+
+  if (availability === "in-stock") {
+    filter.stock = { $gt: 0 };
+  }
+
+  if (availability === "out-of-stock") {
+    filter.stock = { $lte: 0 };
   }
   let sortOption = { createdAt: -1 }; // Default: newest first
 

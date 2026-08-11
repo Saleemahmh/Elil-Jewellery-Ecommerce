@@ -1,74 +1,48 @@
 import { FiX } from "react-icons/fi";
-import { useSearchParams } from "react-router-dom";
 
-const ActiveFilters = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+const ActiveFilters = ({
+  filters = {},
+  onFilterChange,
+  onClearFilters,
+}) => {
 
-  const filters = [];
+  const hasFilters =
+    filters.category ||
+    filters.collection ||
+    filters.minPrice ||
+    filters.maxPrice ||
+    filters.availability;
 
-  const category = searchParams.get("category");
-  const collection = searchParams.get("collection");
-  const maxPrice = searchParams.get("maxPrice");
-  const inStock = searchParams.get("inStock");
 
-  if (category) {
-    filters.push({
-      key: "category",
-      label: category,
-    });
-  }
-
-  if (collection) {
-    filters.push({
-      key: "collection",
-      label: collection,
-    });
-  }
-
-  if (maxPrice && maxPrice !== "50000") {
-    filters.push({
-      key: "maxPrice",
-      label: `Under ₹${Number(maxPrice).toLocaleString("en-IN")}`,
-    });
-  }
-
-  if (inStock === "true") {
-    filters.push({
-      key: "inStock",
-      label: "In Stock",
-    });
-  }
-
-  const removeFilter = (key) => {
-    const params = new URLSearchParams(searchParams);
-
-    params.delete(key);
-    params.set("page", "1");
-
-    setSearchParams(params);
-  };
-
-  const clearAll = () => {
-    const params = new URLSearchParams();
-
-    setSearchParams(params);
-  };
-
-  if (filters.length === 0) {
+  if (!hasFilters) {
     return null;
   }
 
-  return (
-    <div className="flex flex-wrap items-center gap-3 mb-6">
 
-      <span className="text-sm text-[#6D6460]">
+  return (
+    <div className="flex flex-wrap items-center gap-3 mb-8">
+
+      <span
+        className="
+          text-sm
+          text-[#6D6460]
+          mr-2
+        "
+      >
         Filters:
       </span>
 
-      {filters.map((filter) => (
+
+      {/* Category */}
+
+      {filters.category && (
         <button
-          key={filter.key}
-          onClick={() => removeFilter(filter.key)}
+          type="button"
+          onClick={() =>
+            onFilterChange({
+              category: "",
+            })
+          }
           className="
             flex
             items-center
@@ -81,28 +55,139 @@ const ActiveFilters = () => {
             py-2
             text-sm
             text-[#4A294B]
-            transition
-            duration-300
             hover:bg-[#4A294B]
             hover:text-white
+            transition-all
+            duration-300
           "
         >
-          {filter.label}
+          Category
 
           <FiX size={14} />
         </button>
-      ))}
+      )}
+
+
+      {/* Collection */}
+
+      {filters.collection && (
+        <button
+          type="button"
+          onClick={() =>
+            onFilterChange({
+              collection: "",
+            })
+          }
+          className="
+            flex
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-[#C7A05A]
+            bg-[#F7F2EB]
+            px-4
+            py-2
+            text-sm
+            text-[#4A294B]
+            hover:bg-[#4A294B]
+            hover:text-white
+            transition-all
+            duration-300
+          "
+        >
+          {filters.collection}
+
+          <FiX size={14} />
+        </button>
+      )}
+
+
+      {/* Price */}
+
+      {filters.maxPrice && (
+        <button
+          type="button"
+          onClick={() =>
+            onFilterChange({
+              minPrice: "",
+              maxPrice: "",
+            })
+          }
+          className="
+            flex
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-[#C7A05A]
+            bg-[#F7F2EB]
+            px-4
+            py-2
+            text-sm
+            text-[#4A294B]
+            hover:bg-[#4A294B]
+            hover:text-white
+            transition-all
+            duration-300
+          "
+        >
+          Under ₹{Number(filters.maxPrice).toLocaleString("en-IN")}
+
+          <FiX size={14} />
+        </button>
+      )}
+
+
+      {/* Availability */}
+
+      {filters.availability && (
+        <button
+          type="button"
+          onClick={() =>
+            onFilterChange({
+              availability: "",
+            })
+          }
+          className="
+            flex
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-[#C7A05A]
+            bg-[#F7F2EB]
+            px-4
+            py-2
+            text-sm
+            text-[#4A294B]
+            hover:bg-[#4A294B]
+            hover:text-white
+            transition-all
+            duration-300
+          "
+        >
+          {filters.availability === "in-stock"
+            ? "In Stock"
+            : "Out of Stock"}
+
+          <FiX size={14} />
+        </button>
+      )}
+
+
+      {/* Clear */}
 
       <button
-        onClick={clearAll}
+        type="button"
+        onClick={onClearFilters}
         className="
-          ml-2
           text-sm
-          text-[#6D6460]
+          text-[#C7A05A]
           underline
           underline-offset-4
           hover:text-[#4A294B]
-          transition
+          transition-colors
         "
       >
         Clear all

@@ -1,41 +1,76 @@
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import FilterSection from "./FilterSection";
 
-const categories = [
-  { label: "Rings", value: "Rings" },
-  { label: "Earrings", value: "Earrings" },
-  { label: "Bracelets", value: "Bracelets" },
-  { label: "Necklaces", value: "Necklaces" },
-  { label: "Pendants", value: "Pendants" },
-];
+{/*const collections = [
+  "Emerald Royale",
+  "Evening Edit",
+  "Celebration",
+];*/}
 
-const collections = [
-  { label: "Emerald Royale", value: "Emerald Royale" },
-  { label: "Evening Edit", value: "Evening Edit" },
-  { label: "Celebration", value: "Celebration" },
-];
+const FilterSidebar = ({
+  filters = {},
+  onFilterChange,
+  onClearFilters,
+}) => {
+  const [price, setPrice] = useState(filters.maxPrice || 50000);
 
-const FilterSidebar = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const selectedCategory = searchParams.get("category") || "";
-  const selectedCollection = searchParams.get("collection") || "";
+  const categories = [
+    {
+      _id: "6a6894a6735f3abda417f487",
+      name: "Rings",
+    },
+    {
+      _id: "6a68962f735f3abda417f488",
+      name: "Necklace",
+    },
+    {
+      _id: "6a689641735f3abda417f489",
+      name: "Pendant",
+    },
+    {
+      _id: "6a6c2ab6681f7b91a3a8943e",
+      name: "Earrings",
+    },
+    {
+      _id: "6a6c2ac6681f7b91a3a8943f",
+      name: "Bracelets",
+    },
+    {
+      _id: "6a6c2ad4681f7b91a3a89441",
+      name: "Jewellery Sets",
+    },
+  ];
 
-  const minPrice = searchParams.get("minPrice") || "1000";
-  const maxPrice = searchParams.get("maxPrice") || "50000";
+  const handleCategoryChange = (categoryId) => {
+    onFilterChange({
+      category:
+        filters.category === categoryId ? "" : categoryId,
+    });
+  };
 
-  const updateFilter = (key, value) => {
-    const params = new URLSearchParams(searchParams);
+  {/*const handleCollectionChange = (collection) => {
+    onFilterChange({
+      collection:
+        filters.collection === collection ? "" : collection,
+    });
+  };*/}
 
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
+  const handlePriceChange = (event) => {
+    const value = Number(event.target.value);
 
-    params.set("page", "1");
+    setPrice(value);
 
-    setSearchParams(params);
+    onFilterChange({
+      maxPrice: value,
+    });
+  };
+
+  const handleAvailabilityChange = (value) => {
+    onFilterChange({
+      availability:
+        filters.availability === value ? "" : value,
+    });
   };
 
   return (
@@ -44,84 +79,100 @@ const FilterSidebar = () => {
       {/* Categories */}
 
       <FilterSection title="Category">
+
         <div className="space-y-4">
 
           {categories.map((category) => (
             <label
-              key={category.value}
+              key={category._id}
               className="
                 flex
                 items-center
                 gap-3
                 cursor-pointer
+                group
               "
             >
               <input
                 type="checkbox"
-                checked={selectedCategory === category.value}
-                onChange={(e) =>
-                  updateFilter(
-                    "category",
-                    e.target.checked ? category.value : ""
-                  )
+                checked={filters.category === category._id}
+                onChange={() =>
+                  handleCategoryChange(category._id)
                 }
                 className="
-                  w-4
                   h-4
+                  w-4
                   accent-[#C7A05A]
                   cursor-pointer
                 "
               />
 
-              <span className="text-[#6D6460]">
-                {category.label}
+              <span
+                className="
+                  text-sm
+                  text-[#6D6460]
+                  group-hover:text-[#4A294B]
+                  transition-colors
+                "
+              >
+                {category.name}
               </span>
             </label>
           ))}
 
         </div>
+
       </FilterSection>
 
-      {/* Collections */}
+
+      {/* Collections 
 
       <FilterSection title="Collection">
+
         <div className="space-y-4">
 
           {collections.map((collection) => (
             <label
-              key={collection.value}
+              key={collection}
               className="
                 flex
                 items-center
                 gap-3
                 cursor-pointer
+                group
               "
             >
               <input
                 type="checkbox"
-                checked={selectedCollection === collection.value}
-                onChange={(e) =>
-                  updateFilter(
-                    "collection",
-                    e.target.checked ? collection.value : ""
-                  )
+                checked={filters.collection === collection}
+                onChange={() =>
+                  handleCollectionChange(collection)
                 }
                 className="
-                  w-4
                   h-4
+                  w-4
                   accent-[#C7A05A]
                   cursor-pointer
                 "
               />
 
-              <span className="text-[#6D6460]">
-                {collection.label}
+              <span
+                className="
+                  text-sm
+                  text-[#6D6460]
+                  group-hover:text-[#4A294B]
+                  transition-colors
+                "
+              >
+                {collection}
               </span>
             </label>
           ))}
 
         </div>
-      </FilterSection>
+
+      </FilterSection>*/}
+
 
       {/* Price */}
 
@@ -131,22 +182,34 @@ const FilterSidebar = () => {
           type="range"
           min="1000"
           max="50000"
-          value={maxPrice}
-          onChange={(e) =>
-            updateFilter("maxPrice", e.target.value)
-          }
-          className="w-full accent-[#C7A05A]"
+          step="500"
+          value={price}
+          onChange={handlePriceChange}
+          className="
+            w-full
+            accent-[#C7A05A]
+            cursor-pointer
+          "
         />
 
-        <div className="flex justify-between mt-3 text-sm text-[#6D6460]">
+        <div
+          className="
+            flex
+            justify-between
+            mt-3
+            text-sm
+            text-[#6D6460]
+          "
+        >
           <span>₹1,000</span>
 
           <span>
-            ₹{Number(maxPrice).toLocaleString("en-IN")}
+            ₹{price.toLocaleString("en-IN")}
           </span>
         </div>
 
       </FilterSection>
+
 
       {/* Availability */}
 
@@ -154,33 +217,87 @@ const FilterSidebar = () => {
 
         <div className="space-y-4">
 
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label
+            className="
+              flex
+              items-center
+              gap-3
+              cursor-pointer
+            "
+          >
+             <input
+        type="checkbox"
+        checked={filters.availability === "in-stock"}
+        onChange={() =>
+          onFilterChange({
+            availability:
+              filters.availability === "in-stock"
+                ? ""
+                : "in-stock",
+          })
+        }
+        className="h-4 w-4 accent-[#C7A05A]"
+      />
 
-            <input
-              type="checkbox"
-              checked={searchParams.get("inStock") === "true"}
-              onChange={(e) =>
-                updateFilter(
-                  "inStock",
-                  e.target.checked ? "true" : ""
-                )
-              }
-              className="
-                w-4
-                h-4
-                accent-[#C7A05A]
-              "
-            />
-
-            <span className="text-[#6D6460]">
+            <span className="text-sm text-[#6D6460]">
               In Stock
             </span>
+          </label>
 
+
+          <label
+            className="
+              flex
+              items-center
+              gap-3
+              cursor-pointer
+            "
+          >
+            <input
+        type="checkbox"
+        checked={filters.availability === "out-of-stock"}
+        onChange={() =>
+          onFilterChange({
+            availability:
+              filters.availability === "out-of-stock"
+                ? ""
+                : "out-of-stock",
+          })
+        }
+        className="h-4 w-4 accent-[#C7A05A]"
+      />
+
+            <span className="text-sm text-[#6D6460]">
+              Out of Stock
+            </span>
           </label>
 
         </div>
 
       </FilterSection>
+
+
+      {/* Clear Filters */}
+
+      <button
+        type="button"
+        onClick={onClearFilters}
+        className="
+          w-full
+          py-3
+          rounded-full
+          border
+          border-[#C7A05A]
+          text-sm
+          text-[#4A294B]
+          hover:bg-[#4A294B]
+          hover:text-white
+          transition-all
+          duration-300
+        "
+      >
+        Clear All Filters
+      </button>
 
     </aside>
   );

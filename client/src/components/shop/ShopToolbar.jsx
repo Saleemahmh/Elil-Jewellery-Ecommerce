@@ -1,31 +1,34 @@
 import { FiFilter } from "react-icons/fi";
-import { useSearchParams } from "react-router-dom";
 
-const ShopToolbar = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+const ShopToolbar = ({
+  totalProducts = 0,
+  filters = {},
+  onSortChange,
+  onMobileFilter,
+}) => {
 
-  const sort = searchParams.get("sort") || "newest";
-
-  const updateSort = (value) => {
-    const params = new URLSearchParams(searchParams);
-
-    if (value === "newest") {
-      params.delete("sort");
-    } else {
-      params.set("sort", value);
-    }
-
-    params.set("page", "1");
-
-    setSearchParams(params);
+  const handleSortChange = (event) => {
+    onSortChange(event.target.value);
   };
 
+
   return (
-    <div className="flex items-center justify-between gap-6">
+    <div
+      className="
+        flex
+        flex-col
+        md:flex-row
+        md:items-center
+        md:justify-between
+        gap-5
+        mb-8
+      "
+    >
 
       {/* Heading */}
 
       <div>
+
         <h2
           className="
             font-[Cinzel]
@@ -37,18 +40,38 @@ const ShopToolbar = () => {
           All Jewellery
         </h2>
 
-        <p className="mt-2 text-[#7A6E68] text-sm">
-          Discover pieces crafted for every occasion.
+        <p
+          className="
+            mt-2
+            text-[#7A6E68]
+            text-sm
+          "
+        >
+          Showing{" "}
+          <span className="text-[#4A294B] font-medium">
+            {totalProducts}
+          </span>{" "}
+          {totalProducts === 1 ? "Product" : "Products"}
         </p>
+
       </div>
+
 
       {/* Controls */}
 
-      <div className="flex items-center gap-4">
+      <div
+        className="
+          flex
+          items-center
+          gap-3
+        "
+      >
 
         {/* Mobile Filter */}
 
         <button
+          type="button"
+          onClick={onMobileFilter}
           className="
             lg:hidden
             flex
@@ -58,11 +81,12 @@ const ShopToolbar = () => {
             border-[#C7A05A]
             rounded-full
             px-5
-            py-2
+            py-2.5
+            text-sm
             text-[#4A294B]
             hover:bg-[#4A294B]
             hover:text-white
-            transition
+            transition-all
             duration-300
           "
         >
@@ -71,21 +95,25 @@ const ShopToolbar = () => {
           Filters
         </button>
 
+
         {/* Sort */}
 
         <select
-          value={sort}
-          onChange={(e) => updateSort(e.target.value)}
+          value={filters.sort || "newest"}
+          onChange={handleSortChange}
           className="
             rounded-full
             border
             border-[#C7A05A]
-            bg-[#F7F2EB]
+            bg-white
             px-5
-            py-2
+            py-2.5
+            text-sm
             text-[#4A294B]
             outline-none
             cursor-pointer
+            focus:ring-1
+            focus:ring-[#C7A05A]
           "
         >
           <option value="newest">
@@ -105,17 +133,15 @@ const ShopToolbar = () => {
           </option>
 
           <option value="name-asc">
-            Name: A–Z
+            Name: A-Z
           </option>
 
           <option value="name-desc">
-            Name: Z–A
+            Name: Z-A
           </option>
-
         </select>
 
       </div>
-
     </div>
   );
 };

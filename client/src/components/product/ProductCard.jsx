@@ -7,7 +7,9 @@ import Button from "../common/Button";
 const ProductCard = ({ product }) => {
   // MongoDB stores images as an array of objects
   const imageUrl =
-    product.images?.[0]?.url || product.image || "/placeholder-product.jpg";
+    product.images?.[0]?.url ||
+    product.image ||
+    "/placeholder-product.jpg";
 
   // Backend populates category
   const categoryName =
@@ -23,6 +25,9 @@ const ProductCard = ({ product }) => {
   const displayPrice = hasDiscount
     ? product.discountPrice
     : product.price;
+
+  // Stock status
+  const isOutOfStock = product.stock <= 0;
 
   return (
     <motion.article
@@ -45,29 +50,39 @@ const ProductCard = ({ product }) => {
           duration-500
         "
       >
-        <Link to={`/product/${product.slug}`}>
+        <Link
+          to={`/product/${product.slug}`}
+          className={isOutOfStock ? "cursor-default" : ""}
+        >
           <motion.img
             src={imageUrl}
             alt={product.name}
-            whileHover={{
-              scale: 1.05,
-              filter: "brightness(1.08)",
-            }}
+            whileHover={
+              !isOutOfStock
+                ? {
+                    scale: 1.05,
+                    filter: "brightness(1.08)",
+                  }
+                : {}
+            }
             transition={{
               duration: 0.7,
             }}
-            className="
+            className={`
               w-full
               aspect-[4/5]
               object-cover
-            "
+              transition-all
+              duration-500
+              ${isOutOfStock ? "opacity-65 grayscale-[15%]" : ""}
+            `}
           />
         </Link>
 
-        {/* Image overlay */}
+        {/* ================= IMAGE OVERLAY ================= */}
 
         <div
-          className="
+          className={`
             pointer-events-none
             absolute
             inset-0
@@ -75,12 +90,56 @@ const ProductCard = ({ product }) => {
             from-black/15
             via-transparent
             to-transparent
-            opacity-0
-            group-hover:opacity-100
             transition-opacity
             duration-500
-          "
+            ${
+              isOutOfStock
+                ? "opacity-100"
+                : "opacity-0 group-hover:opacity-100"
+            }
+          `}
         />
+
+        {/* ================= OUT OF STOCK ================= */}
+
+        {isOutOfStock && (
+          <div
+            className="
+              absolute
+              inset-0
+              z-20
+              flex
+              items-center
+              justify-center
+              pointer-events-none
+            "
+          >
+            <div
+              className="
+                rounded-full
+                border
+                border-[#C7A05A]
+                bg-[#F7F2EB]/95
+                px-6
+                py-3
+                shadow-[0_8px_25px_rgba(74,41,75,.15)]
+              "
+            >
+              <span
+                className="
+                  font-[Cinzel]
+                  text-xs
+                  md:text-sm
+                  tracking-[0.2em]
+                  text-[#4A294B]
+                  whitespace-nowrap
+                "
+              >
+                OUT OF STOCK
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* ================= WISHLIST ================= */}
 
@@ -110,6 +169,7 @@ const ProductCard = ({ product }) => {
             absolute
             top-4
             right-4
+            z-30
             w-9
             h-9
             md:w-10
@@ -141,6 +201,7 @@ const ProductCard = ({ product }) => {
               absolute
               top-4
               left-4
+              z-30
               rounded-full
               bg-[#4A294B]
               px-3
@@ -162,6 +223,7 @@ const ProductCard = ({ product }) => {
               absolute
               top-4
               left-4
+              z-30
               rounded-full
               bg-[#4A294B]
               px-3
@@ -254,24 +316,48 @@ const ProductCard = ({ product }) => {
         {/* ================= ADD TO CART ================= */}
 
         <div className="mt-6 h-12 overflow-hidden">
-          <div
-            className="
-              translate-y-6
-              opacity-0
-              group-hover:translate-y-0
-              group-hover:opacity-100
-              transition-all
-              duration-300
-              ease-out
-            "
-          >
-            <Button
-              variant="gold"
-              className="w-full rounded-xl py-3"
+
+          {isOutOfStock ? (
+            <div>
+              <button
+                type="button"
+                disabled
+                className="
+                  w-full
+                  rounded-xl
+                  py-3
+                  border
+                  border-[#C7A05A]/50
+                  bg-[#F7F2EB]
+                  text-[#8A817B]
+                  text-sm
+                  cursor-not-allowed
+                "
+              >
+                Out of Stock
+              </button>
+            </div>
+          ) : (
+            <div
+              className="
+                translate-y-6
+                opacity-0
+                group-hover:translate-y-0
+                group-hover:opacity-100
+                transition-all
+                duration-300
+                ease-out
+              "
             >
-              Add to Cart
-            </Button>
-          </div>
+              <Button
+                variant="gold"
+                className="w-full rounded-xl py-3"
+              >
+                Add to Cart
+              </Button>
+            </div>
+          )}
+
         </div>
 
       </div>
