@@ -10,8 +10,14 @@ export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
 
   async (params = {}, thunkAPI) => {
+    // `append` is a UI-only flag for "Load More" — strip it before
+    // it goes out as a query param, but keep it around to tell the
+    // reducer whether to replace or append the results.
+    const { append = false, ...queryParams } = params;
+
     try {
-      return await getProducts(params);
+      const data = await getProducts(queryParams);
+      return { ...data, append };
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Failed to fetch products",
@@ -34,6 +40,8 @@ const initialState = {
   currentPage: 1,
 
   loading: false,
+
+  loadingMore: false,
 
   error: null,
 
@@ -114,8 +122,16 @@ const productSlice = createSlice({
       // FETCH PENDING
       // ------------------------------------------------
 
-      .addCase(fetchProducts.pending, (state) => {
-        state.loading = true;
+      .addCase(fetchProducts.pending, (state, action) => {
+        // A "Load More" request shows its own loading state
+        // (loadingMore) instead of the full-page spinner, so the
+        // 10 products already on screen don't disappear while the
+        // next page loads.
+        if (action.meta.arg?.append) {
+          state.loadingMore = true;
+        } else {
+          state.loading = true;
+        }
         state.error = null;
       })
 
@@ -125,8 +141,13 @@ const productSlice = createSlice({
 
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
+        state.loadingMore = false;
 
-        state.products = action.payload.products || [];
+        const newProducts = action.payload.products || [];
+
+        state.products = action.payload.append
+          ? [...state.products, ...newProducts]
+          : newProducts;
 
         state.totalProducts = action.payload.totalProducts || 0;
 
@@ -141,6 +162,7 @@ const productSlice = createSlice({
 
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
+        state.loadingMore = false;
 
         state.error = action.payload || "Failed to fetch products";
       });
