@@ -32,7 +32,7 @@ router.post(
 
 router.get("/", protectOptional, getProducts);
 
-router.get("/:id", getProduct);
+router.get("/:slug", getProduct);
 
 router.patch(
   "/:id",

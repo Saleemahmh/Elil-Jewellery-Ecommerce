@@ -7,12 +7,13 @@ import Home from "../pages/Home/Home.jsx";
 import MainLayout from "../layouts/MainLayout.jsx";
 import Shop from "../pages/Shop/Shop.jsx";
 import Auth from "../pages/auth/Auth.jsx";
+import ProductDetails from "../pages/ProductDetails/ProductDetails.jsx";
 const AppRoutes = () => {
   const dispatch = useDispatch();
 
-useEffect(() => {
-  dispatch(fetchCurrentUser());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchCurrentUser());
+  }, [dispatch]);
   return (
     <Routes>
       <Route element={<MainLayout />}>
@@ -21,6 +22,7 @@ useEffect(() => {
         <Route path="/account" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
+        <Route path="/product/:slug" element={<ProductDetails />} />
       </Route>
     </Routes>
   );

@@ -6,6 +6,7 @@ import {
   createProduct as createProductService,
   getAllProducts as getAllProductsService,
   getProductById as getProductByIdService,
+  getProductBySlug as getProductBySlugService,
   updateProduct as updateProductService,
   deleteProduct as deleteProductService,
 } from "../services/product.service.js";
@@ -65,7 +66,7 @@ export const getProducts = async (req, res) => {
 
 export const getProduct = async (req, res) => {
   try {
-    const product = await getProductByIdService(req.params.id);
+    const product = await getProductBySlugService(req.params.slug);
 
     return res.status(200).json({
       success: true,

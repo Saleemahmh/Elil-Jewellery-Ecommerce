@@ -138,7 +138,16 @@ export const getProductById = async (id) => {
   }
   return product;
 };
+// get product by slug
+export const getProductBySlug = async (slug) => {
+  const product = await Product.findOne({ slug }).populate("category");
 
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  return product;
+};
 //update product
 
 export const updateProduct = async (id, updateData) => {

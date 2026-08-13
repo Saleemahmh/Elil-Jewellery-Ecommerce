@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import { getProducts } from "../../services/productService";
+import { getProducts, getProductBySlug } from "../../services/productService";
 
 // ======================================================
 // FETCH PRODUCTS
@@ -25,6 +25,23 @@ export const fetchProducts = createAsyncThunk(
     }
   },
 );
+// ============================================
+// FETCH PRODUCT BY SLUG
+// ============================================
+
+export const fetchProductBySlug = createAsyncThunk(
+  "products/fetchProductBySlug",
+
+  async (slug, thunkAPI) => {
+    try {
+      return await getProductBySlug(slug);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch product",
+      );
+    }
+  },
+);
 
 // ======================================================
 // INITIAL STATE
@@ -32,6 +49,11 @@ export const fetchProducts = createAsyncThunk(
 
 const initialState = {
   products: [],
+
+  //Product details
+  selectedProduct: null,
+  productLoading: false,
+  productError: null,
 
   totalProducts: 0,
 
@@ -165,6 +187,28 @@ const productSlice = createSlice({
         state.loadingMore = false;
 
         state.error = action.payload || "Failed to fetch products";
+      })
+      // ------------------------------------------------
+      // FETCH PRODUCT BY SLUG - PENDING
+      // ------------------------------------------------
+
+      .addCase(fetchProductBySlug.pending, (state) => {
+        state.productLoading = true;
+        state.productError = null;
+        state.selectedProduct = null;
+      })
+      .addCase(fetchProductBySlug.fulfilled, (state, action) => {
+        state.productLoading = false;
+        state.productError = null;
+
+        state.selectedProduct = action.payload.product || null;
+      })
+      .addCase(fetchProductBySlug.rejected, (state, action) => {
+        state.productLoading = false;
+
+        state.productError = action.payload || "Failed to fetch product";
+
+        state.selectedProduct = null;
       });
   },
 });
