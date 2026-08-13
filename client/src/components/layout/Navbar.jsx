@@ -24,7 +24,9 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const dispatch = useDispatch();
-
+const { totalItems } = useSelector(
+    (state) => state.cart
+  );  
   // ================= AUTH STATE =================
 
   const { isAuthenticated, user } = useSelector(
@@ -152,16 +154,41 @@ const Navbar = () => {
             {/* ================================================= */}
 
             <Link
-              to="/cart"
-              aria-label="Shopping Cart"
-              title="Shopping Cart"
-              className="
-                hover:text-[#C7A05A]
-                transition-colors
-              "
-            >
-              <FiShoppingBag />
-            </Link>
+  to="/cart"
+  aria-label={`Shopping Cart${totalItems > 0 ? `, ${totalItems} items` : ""}`}
+  title="Shopping Cart"
+  className="
+    relative
+    hover:text-[#C7A05A]
+    transition-colors
+  "
+>
+  <FiShoppingBag />
+
+  {totalItems > 0 && (
+    <span
+      className="
+        absolute
+        -top-2
+        -right-2
+        min-w-[18px]
+        h-[18px]
+        px-1
+        rounded-full
+        bg-[#4A294B]
+        text-[#F7F2EB]
+        text-[10px]
+        font-semibold
+        flex
+        items-center
+        justify-center
+        leading-none
+      "
+    >
+      {totalItems > 99 ? "99+" : totalItems}
+    </span>
+  )}
+</Link>
 
             {/* ================================================= */}
             {/* ACCOUNT / LOGOUT */}
@@ -425,7 +452,7 @@ const Navbar = () => {
                 >
                   <FiHeart />
                 </Link>
-
+                
                 {/* ================================================= */}
                 {/* MOBILE ACCOUNT / LOGOUT */}
                 {/* ================================================= */}

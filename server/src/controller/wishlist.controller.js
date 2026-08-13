@@ -35,7 +35,6 @@ export const addToWishlist = async (req, res) => {
         ? "Product is already wishlisted"
         : "Product added to wishlist",
       wishlist,
-      wishlist,
     });
   } catch (error) {
     return res.status(400).json({

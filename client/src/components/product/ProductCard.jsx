@@ -1,23 +1,38 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiHeart } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-hot-toast";
+
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../../redux/slices/wishlistSlice";
+
+import {
+  addToCart,
+  fetchCart,
+  updateCartItem,
+  removeCartItem,
+} from "../../redux/slices/cartSlice";
 
 import Button from "../common/Button";
 
 const ProductCard = ({ product }) => {
-  // MongoDB stores images as an array of objects
+  // =========================================
+  // PRODUCT DATA
+  // =========================================
+
   const imageUrl =
     product.images?.[0]?.url ||
     product.image ||
     "/placeholder-product.jpg";
 
-  // Backend populates category
   const categoryName =
     typeof product.category === "object"
       ? product.category?.name
       : product.category;
 
-  // Use discounted price when available
   const hasDiscount =
     product.discountPrice > 0 &&
     product.discountPrice < product.price;
@@ -26,8 +41,249 @@ const ProductCard = ({ product }) => {
     ? product.discountPrice
     : product.price;
 
-  // Stock status
   const isOutOfStock = product.stock <= 0;
+
+  // =========================================
+  // REDUX
+  // =========================================
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
+
+  const { products: wishlistProducts } = useSelector(
+    (state) => state.wishlist
+  );
+
+  const cartState = useSelector(
+    (state) => state.cart
+  );
+
+  // =========================================
+  // CART ITEMS
+  // =========================================
+
+  /*
+    Depending on your cartSlice structure, the cart
+    may be stored as:
+
+    state.cart.items
+
+    OR:
+
+    state.cart.cart.items
+
+    This handles both structures safely.
+  */
+
+  const cartItems =
+    cartState?.items ||
+    cartState?.cart?.items ||
+    [];
+
+  const cartItem = cartItems.find((item) => {
+    const itemProductId =
+      typeof item.product === "object"
+        ? item.product?._id
+        : item.product;
+
+    return itemProductId === product._id;
+  });
+
+  const cartQuantity = cartItem?.quantity || 0;
+
+  // =========================================
+  // WISHLIST STATUS
+  // =========================================
+
+  const isWishlisted = wishlistProducts?.some((item) => {
+    const itemId =
+      typeof item === "object"
+        ? item._id
+        : item;
+
+    return itemId === product._id;
+  });
+
+  // =========================================
+  // WISHLIST HANDLER
+  // =========================================
+
+  const handleWishlist = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast("Please log in to add items to your wishlist.", {
+        icon: "♡",
+      });
+
+      navigate("/login");
+
+      return;
+    }
+
+    try {
+      // REMOVE
+      if (isWishlisted) {
+        const result = await dispatch(
+          removeFromWishlist(product._id)
+        );
+
+        if (
+          removeFromWishlist.fulfilled.match(result)
+        ) {
+          toast.success("Removed from wishlist");
+        } else {
+          toast.error(
+            result.payload ||
+              "Unable to remove from wishlist"
+          );
+        }
+
+        return;
+      }
+
+      // ADD
+      const result = await dispatch(
+        addToWishlist(product._id)
+      );
+
+      if (
+        addToWishlist.fulfilled.match(result)
+      ) {
+        toast.success("Added to wishlist");
+      } else {
+        toast.error(
+          result.payload ||
+            "Unable to add to wishlist"
+        );
+      }
+    } catch (error) {
+      toast.error(
+        "Unable to update wishlist"
+      );
+    }
+  };
+
+  // =========================================
+  // ADD TO CART
+  // =========================================
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error(
+        "Please log in to add items to your cart."
+      );
+
+      navigate("/login");
+
+      return;
+    }
+
+    if (isOutOfStock) {
+      return;
+    }
+
+    try {
+      await dispatch(
+        addToCart({
+          productId: product._id,
+          quantity: 1,
+        })
+      ).unwrap();
+
+      await dispatch(fetchCart()).unwrap();
+
+      toast.success("Added to cart!");
+    } catch (error) {
+      toast.error(
+        error ||
+          "Unable to add product to cart."
+      );
+    }
+  };
+
+  // =========================================
+  // INCREASE CART QUANTITY
+  // =========================================
+
+  const handleIncreaseQuantity = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (cartQuantity >= product.stock) {
+      toast.error(
+        `Only ${product.stock} available in stock`
+      );
+
+      return;
+    }
+
+    try {
+      await dispatch(
+        updateCartItem({
+          productId: product._id,
+          quantity: cartQuantity + 1,
+        })
+      ).unwrap();
+
+      await dispatch(fetchCart()).unwrap();
+    } catch (error) {
+      toast.error(
+        error ||
+          "Unable to update cart"
+      );
+    }
+  };
+
+  // =========================================
+  // DECREASE CART QUANTITY
+  // =========================================
+
+  const handleDecreaseQuantity = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      // If quantity is 1, remove item completely
+      if (cartQuantity === 1) {
+        await dispatch(
+          removeCartItem(product._id)
+        ).unwrap();
+
+        await dispatch(fetchCart()).unwrap();
+
+        toast.success("Removed from cart");
+
+        return;
+      }
+
+      await dispatch(
+        updateCartItem({
+          productId: product._id,
+          quantity: cartQuantity - 1,
+        })
+      ).unwrap();
+
+      await dispatch(fetchCart()).unwrap();
+    } catch (error) {
+      toast.error(
+        error ||
+          "Unable to update cart"
+      );
+    }
+  };
+
+  // =========================================
+  // UI
+  // =========================================
 
   return (
     <motion.article
@@ -52,7 +308,11 @@ const ProductCard = ({ product }) => {
       >
         <Link
           to={`/product/${product.slug}`}
-          className={isOutOfStock ? "cursor-default" : ""}
+          className={
+            isOutOfStock
+              ? "cursor-default"
+              : ""
+          }
         >
           <motion.img
             src={imageUrl}
@@ -74,7 +334,11 @@ const ProductCard = ({ product }) => {
               object-cover
               transition-all
               duration-500
-              ${isOutOfStock ? "opacity-65 grayscale-[15%]" : ""}
+              ${
+                isOutOfStock
+                  ? "opacity-65 grayscale-[15%]"
+                  : ""
+              }
             `}
           />
         </Link>
@@ -145,6 +409,7 @@ const ProductCard = ({ product }) => {
 
         <motion.button
           type="button"
+          onClick={handleWishlist}
           whileHover={{
             scale: 1.1,
           }}
@@ -164,8 +429,12 @@ const ProductCard = ({ product }) => {
           transition={{
             duration: 0.4,
           }}
-          aria-label={`Add ${product.name} to wishlist`}
-          className="
+          aria-label={
+            isWishlisted
+              ? `Remove ${product.name} from wishlist`
+              : `Add ${product.name} to wishlist`
+          }
+          className={`
             absolute
             top-4
             right-4
@@ -186,11 +455,21 @@ const ProductCard = ({ product }) => {
             group-hover:opacity-100
             transition-all
             duration-300
-            hover:bg-[#C7A05A]
-            hover:text-white
-          "
+            ${
+              isWishlisted
+                ? "bg-[#E6C37A] text-[#4A294B]"
+                : "text-[#4A294B] hover:bg-[#C7A05A] hover:text-white"
+            }
+          `}
         >
-          <FiHeart size={18} />
+          <FiHeart
+            size={18}
+            className={
+              isWishlisted
+                ? "fill-current"
+                : ""
+            }
+          />
         </motion.button>
 
         {/* ================= PRODUCT LABELS ================= */}
@@ -217,27 +496,28 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {!product.newArrival && product.bestSeller && (
-          <div
-            className="
-              absolute
-              top-4
-              left-4
-              z-30
-              rounded-full
-              bg-[#4A294B]
-              px-3
-              py-1.5
-              text-[10px]
-              uppercase
-              tracking-[0.18em]
-              text-[#E6C37A]
-              shadow-md
-            "
-          >
-            Bestseller
-          </div>
-        )}
+        {!product.newArrival &&
+          product.bestSeller && (
+            <div
+              className="
+                absolute
+                top-4
+                left-4
+                z-30
+                rounded-full
+                bg-[#4A294B]
+                px-3
+                py-1.5
+                text-[10px]
+                uppercase
+                tracking-[0.18em]
+                text-[#E6C37A]
+                shadow-md
+              "
+            >
+              Bestseller
+            </div>
+          )}
       </div>
 
       {/* ================= CONTENT ================= */}
@@ -295,7 +575,8 @@ const ProductCard = ({ product }) => {
               text-[#4A294B]
             "
           >
-            ₹ {displayPrice?.toLocaleString("en-IN")}
+            ₹{" "}
+            {displayPrice?.toLocaleString("en-IN")}
           </p>
 
           {hasDiscount && (
@@ -307,34 +588,122 @@ const ProductCard = ({ product }) => {
                 line-through
               "
             >
-              ₹ {product.price?.toLocaleString("en-IN")}
+              ₹{" "}
+              {product.price?.toLocaleString(
+                "en-IN"
+              )}
             </p>
           )}
 
         </div>
 
-        {/* ================= ADD TO CART ================= */}
+        {/* ================= CART ACTION ================= */}
 
         <div className="mt-6 h-12 overflow-hidden">
 
           {isOutOfStock ? (
-            <div>
+            <button
+              type="button"
+              disabled
+              className="
+                w-full
+                rounded-xl
+                py-3
+                border
+                border-[#C7A05A]/50
+                bg-[#F7F2EB]
+                text-[#8A817B]
+                text-sm
+                cursor-not-allowed
+              "
+            >
+              Out of Stock
+            </button>
+          ) : cartQuantity > 0 ? (
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+                w-full
+                h-12
+                rounded-xl
+                border
+                border-[#C7A05A]
+                bg-[#F7F2EB]
+                overflow-hidden
+                translate-y-6
+                opacity-0
+                group-hover:translate-y-0
+                group-hover:opacity-100
+                transition-all
+                duration-300
+                ease-out
+              "
+            >
+              {/* MINUS */}
+
               <button
                 type="button"
-                disabled
+                onClick={handleDecreaseQuantity}
                 className="
-                  w-full
-                  rounded-xl
-                  py-3
-                  border
-                  border-[#C7A05A]/50
-                  bg-[#F7F2EB]
-                  text-[#8A817B]
+                  w-12
+                  h-full
+                  flex
+                  items-center
+                  justify-center
+                  text-xl
+                  text-[#4A294B]
+                  hover:bg-[#4A294B]
+                  hover:text-white
+                  transition-colors
+                  duration-300
+                "
+                aria-label={`Decrease ${product.name} quantity`}
+              >
+                −
+              </button>
+
+              {/* QUANTITY */}
+
+              <span
+                className="
+                  flex-1
+                  text-center
                   text-sm
-                  cursor-not-allowed
+                  font-medium
+                  text-[#4A294B]
                 "
               >
-                Out of Stock
+                {cartQuantity} in cart
+              </span>
+
+              {/* PLUS */}
+
+              <button
+                type="button"
+                onClick={handleIncreaseQuantity}
+                disabled={
+                  cartQuantity >= product.stock
+                }
+                className="
+                  w-12
+                  h-full
+                  flex
+                  items-center
+                  justify-center
+                  text-xl
+                  text-[#4A294B]
+                  hover:bg-[#4A294B]
+                  hover:text-white
+                  disabled:cursor-not-allowed
+                  disabled:opacity-40
+                  transition-colors
+                  duration-300
+                "
+                aria-label={`Increase ${product.name} quantity`}
+              >
+                +
               </button>
             </div>
           ) : (
@@ -351,6 +720,7 @@ const ProductCard = ({ product }) => {
             >
               <Button
                 variant="gold"
+                onClick={handleAddToCart}
                 className="w-full rounded-xl py-3"
               >
                 Add to Cart

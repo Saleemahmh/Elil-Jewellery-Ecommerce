@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FiX } from "react-icons/fi";
+import { fetchWishlist } from "../../redux/slices/wishlistSlice";
 
 import Container from "../../components/common/Container";
 import ShopToolbar from "../../components/shop/ShopToolbar";
@@ -12,7 +13,9 @@ import { fetchProducts } from "../../redux/slices/productSlice";
 
 const Shop = () => {
   const dispatch = useDispatch();
-
+  const { isAuthenticated } = useSelector(
+  (state) => state.auth
+);
   const { totalProducts } = useSelector(
     (state) => state.products
   );
@@ -40,7 +43,11 @@ const Shop = () => {
   // =========================================
   // FETCH PRODUCTS
   // =========================================
-
+  useEffect(() => {
+  if (isAuthenticated) {
+    dispatch(fetchWishlist());
+  }
+}, [dispatch, isAuthenticated]);
   useEffect(() => {
     const params = {
       page: 1,
