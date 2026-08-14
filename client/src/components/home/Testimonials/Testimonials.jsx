@@ -1,6 +1,6 @@
 import Container from "../../common/Container";
 import SectionTitle from "../../common/SectionTitle";
-import TestimonialCard from "./TestimonialCard";
+import TestimonialCard from "./Testimonialcard";
 
 import { testimonials } from "../../../data/textimonials.js";
 
