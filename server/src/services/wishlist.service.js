@@ -2,7 +2,12 @@ import Wishlist from "../models/wishlist.js";
 
 // Get wishlist
 export const getWishlist = async (userId) => {
-  let wishlist = await Wishlist.findOne({ user: userId }).populate("products");
+  let wishlist = await Wishlist.findOne({ user: userId }).populate({
+    path: "products",
+    populate: {
+      path: "category",
+    },
+  });
 
   if (!wishlist) {
     wishlist = await Wishlist.create({
@@ -10,12 +15,16 @@ export const getWishlist = async (userId) => {
       products: [],
     });
 
-    wishlist = await Wishlist.findById(wishlist._id).populate("products");
+    wishlist = await Wishlist.findById(wishlist._id).populate({
+      path: "products",
+      populate: {
+        path: "category",
+      },
+    });
   }
 
   return wishlist;
 };
-
 // Add product
 export const addToWishlist = async (userId, productId) => {
   let wishlist = await Wishlist.findOne({ user: userId });
@@ -30,9 +39,12 @@ export const addToWishlist = async (userId, productId) => {
   const exists = wishlist.products.some((id) => id.toString() === productId);
 
   if (exists) {
-    const populatedWishlist = await Wishlist.findById(wishlist._id).populate(
-      "products",
-    );
+    const populatedWishlist = await Wishlist.findById(wishlist._id).populate({
+      path: "products",
+      populate: {
+        path: "category",
+      },
+    });
 
     return {
       wishlist: populatedWishlist,
@@ -44,16 +56,18 @@ export const addToWishlist = async (userId, productId) => {
 
   await wishlist.save();
 
-  const populatedWishlist = await Wishlist.findById(wishlist._id).populate(
-    "products",
-  );
+  const populatedWishlist = await Wishlist.findById(wishlist._id).populate({
+    path: "products",
+    populate: {
+      path: "category",
+    },
+  });
 
   return {
     wishlist: populatedWishlist,
     alreadyExists: false,
   };
 };
-
 // Remove product
 export const removeFromWishlist = async (userId, productId) => {
   const wishlist = await Wishlist.findOne({ user: userId });
@@ -68,5 +82,10 @@ export const removeFromWishlist = async (userId, productId) => {
 
   await wishlist.save();
 
-  return await Wishlist.findById(wishlist._id).populate("products");
+  return await Wishlist.findById(wishlist._id).populate({
+    path: "products",
+    populate: {
+      path: "category",
+    },
+  });
 };

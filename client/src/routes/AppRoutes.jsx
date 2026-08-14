@@ -8,6 +8,8 @@ import MainLayout from "../layouts/MainLayout.jsx";
 import Shop from "../pages/Shop/Shop.jsx";
 import Auth from "../pages/auth/Auth.jsx";
 import ProductDetails from "../pages/ProductDetails/ProductDetails.jsx";
+import Wishlist from "../pages/Wishlist/Wishlist.jsx";
+import Cart from "../pages/Cart/Cart.jsx";
 const AppRoutes = () => {
   const dispatch = useDispatch();
 
@@ -23,6 +25,8 @@ const AppRoutes = () => {
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
         <Route path="/product/:slug" element={<ProductDetails />} />
+        <Route path="/wishlist" element={<Wishlist />}/>
+        <Route path="/cart" element={<Cart />}/>
       </Route>
     </Routes>
   );

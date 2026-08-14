@@ -1,7 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
+
+import { resetCart, fetchCart } from "../../redux/slices/cartSlice";
+import {
+  clearWishlist,
+  fetchWishlist,
+} from "../../redux/slices/wishlistSlice";
+
+import toast from "react-hot-toast";
 
 import {
   FiSearch,
@@ -14,36 +22,81 @@ import {
 } from "react-icons/fi";
 
 import Container from "../common/Container";
+import CartDrawer from "../cart/CartDrawer";
+
 import logo from "../../assets/logo/Logo-revised_v1.png";
 
 import { logout } from "../../redux/slices/authSlice";
 
-const navItems = ["Home", "Shop", "Collections", "About"];
+const navItems = [
+  "Home",
+  "Shop",
+  "Collections",
+  "About",
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   const dispatch = useDispatch();
-const { totalItems } = useSelector(
-    (state) => state.cart
-  );  
+
   // ================= AUTH STATE =================
 
   const { isAuthenticated, user } = useSelector(
     (state) => state.auth
   );
 
+  // ================= CART STATE =================
+
+  const { totalItems } = useSelector(
+    (state) => state.cart
+  );
+
+  // ================= LOAD USER DATA =================
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCart());
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, isAuthenticated]);
+
   // ================= LOGOUT =================
 
   const handleLogout = async () => {
-    await dispatch(logout());
+    try {
+      await dispatch(logout()).unwrap();
 
-    // Close mobile menu after logout
-    setIsOpen(false);
+      // Clear user-specific Redux data
+      dispatch(resetCart());
+      dispatch(clearWishlist());
+
+      toast.success("You've been logged out.");
+    } catch (errorMessage) {
+      toast.error(
+        errorMessage ||
+          "Unable to log out. Please try again."
+      );
+    } finally {
+      // Close mobile menu and cart drawer
+      setIsOpen(false);
+      setCartOpen(false);
+    }
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#F7F2EB]/95 backdrop-blur-md border-b border-[#E7DED4]">
+    <header
+      className="
+        sticky
+        top-0
+        z-50
+        bg-[#F7F2EB]/95
+        backdrop-blur-md
+        border-b
+        border-[#E7DED4]
+      "
+    >
       <Container>
         <nav className="flex items-center justify-between h-24">
 
@@ -86,6 +139,7 @@ const { totalItems } = useSelector(
                     text-[15px]
                     transition-colors
                     duration-300
+
                     ${
                       isActive
                         ? "text-[#C7A05A]"
@@ -150,14 +204,16 @@ const { totalItems } = useSelector(
             </Link>
 
             {/* ================================================= */}
-            {/* CART */}
-            {/* ================================================= */}
+{/* CART — DESKTOP */}
+{/* ================================================= */}
 
-            <Link
+<Link
   to="/cart"
-  aria-label={`Shopping Cart${totalItems > 0 ? `, ${totalItems} items` : ""}`}
+  aria-label="Shopping Cart"
   title="Shopping Cart"
   className="
+    hidden
+    lg:flex
     relative
     hover:text-[#C7A05A]
     transition-colors
@@ -165,31 +221,74 @@ const { totalItems } = useSelector(
 >
   <FiShoppingBag />
 
-  {totalItems > 0 && (
+  {isAuthenticated && totalItems > 0 && (
     <span
       className="
         absolute
         -top-2
         -right-2
+        flex
+        items-center
+        justify-center
         min-w-[18px]
         h-[18px]
         px-1
         rounded-full
-        bg-[#4A294B]
-        text-[#F7F2EB]
+        bg-[#C7A05A]
+        text-white
         text-[10px]
-        font-semibold
-        flex
-        items-center
-        justify-center
+        font-medium
         leading-none
       "
     >
-      {totalItems > 99 ? "99+" : totalItems}
+      {totalItems}
     </span>
   )}
 </Link>
 
+{/* ================================================= */}
+{/* CART — MOBILE */}
+{/* ================================================= */}
+
+<button
+  type="button"
+  aria-label="Open Shopping Cart"
+  title="Shopping Cart"
+  onClick={() => setCartOpen(true)}
+  className="
+    relative
+    flex
+    lg:hidden
+    hover:text-[#C7A05A]
+    transition-colors
+  "
+>
+  <FiShoppingBag />
+
+  {isAuthenticated && totalItems > 0 && (
+    <span
+      className="
+        absolute
+        -top-2
+        -right-2
+        flex
+        items-center
+        justify-center
+        min-w-[18px]
+        h-[18px]
+        px-1
+        rounded-full
+        bg-[#C7A05A]
+        text-white
+        text-[10px]
+        font-medium
+        leading-none
+      "
+    >
+      {totalItems}
+    </span>
+  )}
+</button>
             {/* ================================================= */}
             {/* ACCOUNT / LOGOUT */}
             {/* ================================================= */}
@@ -198,7 +297,11 @@ const { totalItems } = useSelector(
               <motion.button
                 type="button"
                 aria-label="Logout"
-                title={`Logout${user?.fullName ? ` (${user.fullName})` : ""}`}
+                title={`Logout${
+                  user?.fullName
+                    ? ` (${user.fullName})`
+                    : ""
+                }`}
                 onClick={handleLogout}
                 whileHover={{
                   scale: 1.08,
@@ -259,15 +362,21 @@ const { totalItems } = useSelector(
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* ================================================= */}
             {/* BACKDROP */}
-            {/* ================================================= */}
 
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              exit={{
+                opacity: 0,
+              }}
+              transition={{
+                duration: 0.3,
+              }}
               onClick={() => setIsOpen(false)}
               className="
                 fixed
@@ -278,14 +387,18 @@ const { totalItems } = useSelector(
               "
             />
 
-            {/* ================================================= */}
             {/* MOBILE PANEL */}
-            {/* ================================================= */}
 
             <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              initial={{
+                x: "100%",
+              }}
+              animate={{
+                x: 0,
+              }}
+              exit={{
+                x: "100%",
+              }}
               transition={{
                 duration: 0.4,
                 ease: [0.22, 1, 0.36, 1],
@@ -307,9 +420,7 @@ const { totalItems } = useSelector(
               "
             >
 
-              {/* ================================================= */}
               {/* MOBILE HEADER */}
-              {/* ================================================= */}
 
               <div className="flex items-center justify-between">
 
@@ -340,9 +451,7 @@ const { totalItems } = useSelector(
 
               </div>
 
-              {/* ================================================= */}
               {/* GOLD DIVIDER */}
-              {/* ================================================= */}
 
               <div
                 className="
@@ -355,9 +464,7 @@ const { totalItems } = useSelector(
                 "
               />
 
-              {/* ================================================= */}
               {/* MOBILE NAV LINKS */}
-              {/* ================================================= */}
 
               <ul className="mt-10 flex flex-col gap-7">
 
@@ -373,7 +480,8 @@ const { totalItems } = useSelector(
                       x: 0,
                     }}
                     transition={{
-                      delay: 0.1 + index * 0.06,
+                      delay:
+                        0.1 + index * 0.06,
                     }}
                   >
                     <NavLink
@@ -383,7 +491,9 @@ const { totalItems } = useSelector(
                           : `/${item.toLowerCase()}`
                       }
                       end={item === "Home"}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() =>
+                        setIsOpen(false)
+                      }
                       className={({ isActive }) =>
                         `
                         font-[Cinzel]
@@ -391,6 +501,7 @@ const { totalItems } = useSelector(
                         tracking-wide
                         transition-colors
                         duration-300
+
                         ${
                           isActive
                             ? "text-[#C7A05A]"
@@ -406,9 +517,7 @@ const { totalItems } = useSelector(
 
               </ul>
 
-              {/* ================================================= */}
               {/* MOBILE SECONDARY ICONS */}
-              {/* ================================================= */}
 
               <div
                 className="
@@ -442,7 +551,9 @@ const { totalItems } = useSelector(
 
                 <Link
                   to="/wishlist"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() =>
+                    setIsOpen(false)
+                  }
                   aria-label="Wishlist"
                   title="Wishlist"
                   className="
@@ -452,10 +563,50 @@ const { totalItems } = useSelector(
                 >
                   <FiHeart />
                 </Link>
-                
-                {/* ================================================= */}
+
+                {/* MOBILE CART */}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setCartOpen(true);
+                  }}
+                  aria-label="Shopping Cart"
+                  title="Shopping Cart"
+                  className="
+                    relative
+                    hover:text-[#C7A05A]
+                    transition-colors
+                  "
+                >
+                  <FiShoppingBag />
+
+                  {isAuthenticated &&
+                    totalItems > 0 && (
+                      <span
+                        className="
+                          absolute
+                          -top-2
+                          -right-2
+                          min-w-[16px]
+                          h-[16px]
+                          px-1
+                          rounded-full
+                          bg-[#C7A05A]
+                          text-white
+                          text-[9px]
+                          flex
+                          items-center
+                          justify-center
+                        "
+                      >
+                        {totalItems}
+                      </span>
+                    )}
+                </button>
+
                 {/* MOBILE ACCOUNT / LOGOUT */}
-                {/* ================================================= */}
 
                 {isAuthenticated ? (
                   <motion.button
@@ -476,7 +627,9 @@ const { totalItems } = useSelector(
                 ) : (
                   <Link
                     to="/account"
-                    onClick={() => setIsOpen(false)}
+                    onClick={() =>
+                      setIsOpen(false)
+                    }
                     aria-label="Account"
                     title="Account"
                     className="
@@ -490,37 +643,46 @@ const { totalItems } = useSelector(
 
               </div>
 
-              {/* ================================================= */}
               {/* LOGGED-IN USER NAME */}
-              {/* ================================================= */}
 
-              {isAuthenticated && user?.fullName && (
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    y: 10,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  className="
-                    mt-5
-                    text-center
-                    text-xs
-                    tracking-[0.15em]
-                    uppercase
-                    text-[#C7A05A]/80
-                  "
-                >
-                  Welcome, {user.fullName}
-                </motion.div>
-              )}
+              {isAuthenticated &&
+                user?.fullName && (
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      y: 10,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    className="
+                      mt-5
+                      text-center
+                      text-xs
+                      tracking-[0.15em]
+                      uppercase
+                      text-[#C7A05A]/80
+                    "
+                  >
+                    Welcome, {user.fullName}
+                  </motion.div>
+                )}
 
             </motion.div>
           </>
         )}
       </AnimatePresence>
+
+      {/* ===================================================== */}
+      {/* CART DRAWER */}
+      {/* ===================================================== */}
+
+      <CartDrawer
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+      />
+
     </header>
   );
 };

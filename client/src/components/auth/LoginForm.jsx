@@ -49,18 +49,14 @@ const LoginForm = () => {
       setLoading(true);
 
       // dispatch(login(...)) runs the authSlice thunk, which updates
-      // state.auth.isAuthenticated / state.auth.user on success — this
-      // is what Navbar's useSelector actually reads. Calling
-      // loginUser() directly (the old code) hit the backend fine but
-      // never told Redux anything changed.
+      // state.auth.isAuthenticated / state.auth.user on success 
       const response = await dispatch(login(formData)).unwrap();
 
       toast.success(response.message || "Welcome back!");
 
       navigate("/shop");
     } catch (errorMessage) {
-      // .unwrap() throws whatever rejectWithValue() returned in the
-      // thunk — already a plain string, not an axios error object.
+      
       toast.error(errorMessage || "Unable to login. Please try again.");
     } finally {
       setLoading(false);

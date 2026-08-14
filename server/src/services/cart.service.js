@@ -1,21 +1,42 @@
 import Cart from "../models/cart.js";
 import Product from "../models/product.js";
 
-//add product to cart
+// =====================================
+// HELPER — GET POPULATED CART
+// =====================================
 
-export const addToCart = async (userId, productId, quantity) => {
-  //check if product exists
+const getPopulatedCart = async (userId) => {
+  return await Cart.findOne({ user: userId }).populate({
+    path: "items.product",
+    populate: {
+      path: "category",
+    },
+  });
+};
+
+// =====================================
+// ADD PRODUCT TO CART
+// =====================================
+
+export const addToCart = async (userId, productId, quantity = 1) => {
+  // Check product exists
   const product = await Product.findById(productId);
+
   if (!product) {
     throw new Error("Product not found");
   }
-  //check if user has a cart
+
+  // Check stock
+  if (product.stock < quantity) {
+    throw new Error("Not enough stock available");
+  }
+
+  // Find user's cart
   let cart = await Cart.findOne({ user: userId });
 
-  //if no cart,create
-
+  // Create cart if it doesn't exist
   if (!cart) {
-    cart = await Cart.create({
+    await Cart.create({
       user: userId,
       items: [
         {
@@ -24,56 +45,92 @@ export const addToCart = async (userId, productId, quantity) => {
         },
       ],
     });
-    return cart;
+
+    return await getPopulatedCart(userId);
   }
-  //check if product exist in cart
+
+  // Check if product already exists
   const existingItem = cart.items.find(
     (item) => item.product.toString() === productId,
   );
+
   if (existingItem) {
-    existingItem.quantity += quantity;
+    const newQuantity = existingItem.quantity + quantity;
+
+    if (newQuantity > product.stock) {
+      throw new Error("Not enough stock available");
+    }
+
+    existingItem.quantity = newQuantity;
   } else {
     cart.items.push({
       product: productId,
       quantity,
     });
   }
+
   await cart.save();
-  return cart;
+
+  // IMPORTANT:
+  // Return populated cart so frontend always has
+  // product name, price, image, category, etc.
+  return await getPopulatedCart(userId);
 };
 
-//get user cart
+// =====================================
+// GET USER CART
+// =====================================
 
 export const getCart = async (userId) => {
-  const cart = await Cart.findOne({ user: userId }).populate({
-    path: "items.product",
-    populate: {
-      path: "category",
-    },
-  });
-  return cart;
+  return await getPopulatedCart(userId);
 };
 
-//update quantuity
+// =====================================
+// UPDATE CART QUANTITY
+// =====================================
 
 export const updateCartItem = async (userId, productId, quantity) => {
   const cart = await Cart.findOne({ user: userId });
+
   if (!cart) {
     throw new Error("Cart not found");
   }
+
   const item = cart.items.find((item) => item.product.toString() === productId);
+
   if (!item) {
     throw new Error("Product not found in cart");
   }
+
+  if (quantity < 1) {
+    throw new Error("Quantity must be at least 1");
+  }
+
+  // Check current product stock
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  if (quantity > product.stock) {
+    throw new Error("Not enough stock available");
+  }
+
   item.quantity = quantity;
+
   await cart.save();
-  return cart;
+
+  return await getPopulatedCart(userId);
 };
 
-//remove cart
+// =====================================
+// REMOVE PRODUCT FROM CART
+// =====================================
 
 export const removeCartItem = async (userId, productId) => {
   const cart = await Cart.findOne({ user: userId });
+
   if (!cart) {
     throw new Error("Cart not found");
   }
@@ -84,10 +141,12 @@ export const removeCartItem = async (userId, productId) => {
 
   await cart.save();
 
-  return cart;
+  return await getPopulatedCart(userId);
 };
 
-//clear cart
+// =====================================
+// CLEAR CART
+// =====================================
 
 export const clearCart = async (userId) => {
   const cart = await Cart.findOne({ user: userId });
@@ -100,5 +159,5 @@ export const clearCart = async (userId) => {
 
   await cart.save();
 
-  return cart;
+  return await getPopulatedCart(userId);
 };
