@@ -162,7 +162,7 @@ const ProductCard = ({ product }) => {
             "Unable to add to wishlist"
         );
       }
-    } catch (error) {
+    } catch {
       toast.error(
         "Unable to update wishlist"
       );

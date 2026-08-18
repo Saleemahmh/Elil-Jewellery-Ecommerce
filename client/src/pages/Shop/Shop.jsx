@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FiX } from "react-icons/fi";
+import { useSearchParams } from "react-router-dom";
 import { fetchWishlist } from "../../redux/slices/wishlistSlice";
 
 import Container from "../../components/common/Container";
@@ -13,6 +14,10 @@ import { fetchProducts } from "../../redux/slices/productSlice";
 
 const Shop = () => {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+
+const categoryFromUrl = searchParams.get("category");
+//const newArrivalParam = searchParams.get("newArrival");
   const { isAuthenticated } = useSelector(
   (state) => state.auth
 );
@@ -24,14 +29,14 @@ const Shop = () => {
   // FILTER STATE
   // =========================================
 
-  const [filters, setFilters] = useState({
-    category: "",
-    collection: "",
-    minPrice: "",
-    maxPrice: "",
-    availability: "",
-    sort: "newest",
-  });
+ const [filters, setFilters] = useState({
+  category: categoryFromUrl || "",
+  collection: "",
+  minPrice: "",
+  maxPrice: "",
+  availability: "",
+  sort: "newest",
+});
 
   // =========================================
   // MOBILE FILTER DRAWER
@@ -43,6 +48,8 @@ const Shop = () => {
   // =========================================
   // FETCH PRODUCTS
   // =========================================
+
+  
   useEffect(() => {
   if (isAuthenticated) {
     dispatch(fetchWishlist());
@@ -58,7 +65,10 @@ const Shop = () => {
     if (filters.category) {
       params.category = filters.category;
     }
-
+    //new arrival
+    if (filters.newArrival === "true") {
+  params.newArrival = "true";
+}
     // Collection
     if (filters.collection) {
       params.collection = filters.collection;
@@ -111,16 +121,17 @@ const Shop = () => {
   // CLEAR FILTERS
   // =========================================
 
-  const handleClearFilters = () => {
-    setFilters({
-      category: "",
-      collection: "",
-      minPrice: "",
-      maxPrice: "",
-      availability: "",
-      sort: "newest",
-    });
-  };
+ const handleClearFilters = () => {
+  setFilters({
+    category: "",
+    collection: "",
+    minPrice: "",
+    maxPrice: "",
+    availability: "",
+    sort: "newest",
+    newArrival: "",
+  });
+};
 
   // =========================================
   // SORT
