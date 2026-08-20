@@ -1,4 +1,4 @@
-import { Navigate, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -10,6 +10,10 @@ import Auth from "../pages/auth/Auth.jsx";
 import ProductDetails from "../pages/ProductDetails/ProductDetails.jsx";
 import Wishlist from "../pages/Wishlist/Wishlist.jsx";
 import Cart from "../pages/Cart/Cart.jsx";
+import Checkout from "../pages/Checkout/Checkout.jsx";
+import OrderSuccess from "../pages/Checkout/OrderSucess.jsx";
+import AccountDashboard from "../pages/Account/AccountDashboard.jsx";
+import Profile from "../pages/Account/Profile.jsx";
 const AppRoutes = () => {
   const dispatch = useDispatch();
 
@@ -21,12 +25,15 @@ const AppRoutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
-        <Route path="/account" element={<Navigate to="/login" replace />} />
+        <Route path="/account" element={<AccountDashboard />} />
         <Route path="/login" element={<Auth />} />
         <Route path="/register" element={<Auth />} />
         <Route path="/product/:slug" element={<ProductDetails />} />
-        <Route path="/wishlist" element={<Wishlist />}/>
-        <Route path="/cart" element={<Cart />}/>
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+        <Route path="/account/profile" element={<Profile />} />
       </Route>
     </Routes>
   );

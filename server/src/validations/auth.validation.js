@@ -33,3 +33,18 @@ export const loginValidation = [
 
   body("password").trim().notEmpty().withMessage("Password is required"),
 ];
+export const updateProfileValidation = [
+  body("fullName")
+    .optional()
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage("Full name must be at least 3 characters"),
+
+  body("phone")
+    .optional()
+    .trim()
+    .isLength({ max: 20 })
+    .withMessage("Phone number is too long"),
+
+  body("avatar").optional().trim(),
+];

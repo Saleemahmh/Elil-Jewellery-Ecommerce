@@ -5,6 +5,7 @@ import {
   loginUser,
   getCurrentUser,
   logoutUser,
+  updateProfile,
 } from "../../services/authService";
 
 // =====================================
@@ -56,6 +57,24 @@ export const fetchCurrentUser = createAsyncThunk(
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Not authenticated",
+      );
+    }
+  },
+);
+// =====================================
+// UPDATE PROFILE
+// =====================================
+
+export const updateUserProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (profileData, thunkAPI) => {
+    try {
+      const response = await updateProfile(profileData);
+
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Unable to update profile",
       );
     }
   },
@@ -182,7 +201,29 @@ const authSlice = createSlice({
 
         state.isAuthenticated = false;
       })
+      // =================================
+      // UPDATE PROFILE
+      // =================================
 
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.user = action.payload.user;
+
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+
+        state.error = action.payload;
+      })
       // =================================
       // LOGOUT
       // =================================

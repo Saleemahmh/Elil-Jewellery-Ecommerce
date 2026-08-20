@@ -32,3 +32,36 @@ export const loginUser = async ({ email, password }) => {
   }
   return user;
 };
+
+// ===============================
+// UPDATE PROFILE
+// ===============================
+
+export const updateUserProfile = async (userId, profileData) => {
+  const { fullName, phone, avatar } = profileData;
+
+  const updateData = {};
+
+  if (fullName !== undefined) {
+    updateData.fullName = fullName;
+  }
+
+  if (phone !== undefined) {
+    updateData.phone = phone;
+  }
+
+  if (avatar !== undefined) {
+    updateData.avatar = avatar;
+  }
+
+  const user = await User.findByIdAndUpdate(userId, updateData, {
+    new: true,
+    runValidators: true,
+  }).select("-password");
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};

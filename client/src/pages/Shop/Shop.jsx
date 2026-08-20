@@ -17,7 +17,16 @@ const Shop = () => {
   const [searchParams] = useSearchParams();
 
 const categoryFromUrl = searchParams.get("category");
-//const newArrivalParam = searchParams.get("newArrival");
+const newArrivalFromUrl = searchParams.get("newArrival");
+
+// NEW — same pattern as the two above, extended to cover the
+// Price Edit pills ("Under ₹2,000" etc. → /shop?maxPrice=2000)
+const collectionFromUrl = searchParams.get("collection");
+const minPriceFromUrl = searchParams.get("minPrice");
+const maxPriceFromUrl = searchParams.get("maxPrice");
+const availabilityFromUrl = searchParams.get("availability");
+const sortFromUrl = searchParams.get("sort");
+
   const { isAuthenticated } = useSelector(
   (state) => state.auth
 );
@@ -31,11 +40,12 @@ const categoryFromUrl = searchParams.get("category");
 
  const [filters, setFilters] = useState({
   category: categoryFromUrl || "",
-  collection: "",
-  minPrice: "",
-  maxPrice: "",
-  availability: "",
-  sort: "newest",
+  collection: collectionFromUrl || "",
+  minPrice: minPriceFromUrl || "",
+  maxPrice: maxPriceFromUrl || "",
+  availability: availabilityFromUrl || "",
+  sort: sortFromUrl || "newest",
+  newArrival: newArrivalFromUrl === "true" ? "true" : "",
 });
 
   // =========================================

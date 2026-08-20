@@ -39,3 +39,13 @@ export const logoutUser = async () => {
 
   return response.data;
 };
+
+// ===============================
+// UPDATE PROFILE
+// ===============================
+
+export const updateProfile = async (profileData) => {
+  const response = await api.patch("/auth/profile", profileData);
+
+  return response.data;
+};

@@ -9,12 +9,13 @@ import cartRoutes from "./routes/cart.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import dashboardRoutes from "./routes/dashboard.route.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
+import newsletterRoutes from "./routes/subscriber.routes.js";
 const app = express();
 
 app.use(
   cors({
-    //origin: " http://localhost:5173",
-    origin: "https://elil-jewellery.onrender.com",
+    origin: " http://localhost:5173",
+    //origin: "https://elil-jewellery.onrender.com",
     credentials: true,
   }),
 );
@@ -35,6 +36,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 //Test Route
 app.get("/", (req, res) => {

@@ -293,46 +293,39 @@ const Navbar = () => {
             {/* ACCOUNT / LOGOUT */}
             {/* ================================================= */}
 
-            {isAuthenticated ? (
-              <motion.button
-                type="button"
-                aria-label="Logout"
-                title={`Logout${
-                  user?.fullName
-                    ? ` (${user.fullName})`
-                    : ""
-                }`}
-                onClick={handleLogout}
-                whileHover={{
-                  scale: 1.08,
-                }}
-                whileTap={{
-                  scale: 0.95,
-                }}
-                className="
-                  hidden
-                  sm:block
-                  hover:text-[#C7A05A]
-                  transition-colors
-                "
-              >
-                <FiLogOut />
-              </motion.button>
-            ) : (
-              <Link
-                to="/account"
-                aria-label="Account"
-                title="Account"
-                className="
-                  hidden
-                  sm:block
-                  hover:text-[#C7A05A]
-                  transition-colors
-                "
-              >
-                <FiUser />
-              </Link>
-            )}
+           {isAuthenticated ? (
+  <Link
+    to="/account"
+    aria-label="My Account"
+    title={`My Account${
+      user?.fullName
+        ? ` (${user.fullName})`
+        : ""
+    }`}
+    className="
+      hidden
+      sm:block
+      hover:text-[#C7A05A]
+      transition-colors
+    "
+  >
+    <FiUser />
+  </Link>
+) : (
+  <Link
+    to="/login"
+    aria-label="Sign In"
+    title="Sign In"
+    className="
+      hidden
+      sm:block
+      hover:text-[#C7A05A]
+      transition-colors
+    "
+  >
+    <FiUser />
+  </Link>
+)}
 
             {/* ================================================= */}
             {/* MOBILE MENU BUTTON */}
@@ -608,38 +601,33 @@ const Navbar = () => {
 
                 {/* MOBILE ACCOUNT / LOGOUT */}
 
-                {isAuthenticated ? (
-                  <motion.button
-                    type="button"
-                    onClick={handleLogout}
-                    aria-label="Logout"
-                    title="Logout"
-                    whileTap={{
-                      scale: 0.95,
-                    }}
-                    className="
-                      hover:text-[#C7A05A]
-                      transition-colors
-                    "
-                  >
-                    <FiLogOut />
-                  </motion.button>
-                ) : (
-                  <Link
-                    to="/account"
-                    onClick={() =>
-                      setIsOpen(false)
-                    }
-                    aria-label="Account"
-                    title="Account"
-                    className="
-                      hover:text-[#C7A05A]
-                      transition-colors
-                    "
-                  >
-                    <FiUser />
-                  </Link>
-                )}
+               {isAuthenticated ? (
+  <Link
+    to="/account"
+    onClick={() => setIsOpen(false)}
+    aria-label="My Account"
+    title="My Account"
+    className="
+      hover:text-[#C7A05A]
+      transition-colors
+    "
+  >
+    <FiUser />
+  </Link>
+) : (
+  <Link
+    to="/login"
+    onClick={() => setIsOpen(false)}
+    aria-label="Sign In"
+    title="Sign In"
+    className="
+      hover:text-[#C7A05A]
+      transition-colors
+    "
+  >
+    <FiUser />
+  </Link>
+)}
 
               </div>
 

@@ -1,4 +1,8 @@
-import { createUser, loginUser } from "../services/auth.service.js";
+import {
+  createUser,
+  loginUser,
+  updateUserProfile,
+} from "../services/auth.service.js";
 import { generateToken } from "../utils/jwt.js";
 import { sendAuthResponse } from "../utils/authResponse.js";
 
@@ -46,14 +50,35 @@ export const getCurrentUser = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    //secure: process.env.NODE_ENV === "production",
-    //sameSite: "strict",
-    secure: true,
-    sameSite: "none",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    //secure: true,
+    //sameSite: "none",
   });
 
   res.status(200).json({
     success: true,
     message: "Logged out successfully",
   });
+};
+
+// =====================================
+// UPDATE PROFILE
+// =====================================
+
+export const updateProfile = async (req, res) => {
+  try {
+    const user = await updateUserProfile(req.user._id, req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

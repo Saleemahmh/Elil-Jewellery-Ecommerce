@@ -5,6 +5,7 @@ import {
   login,
   getCurrentUser,
   logout,
+  updateProfile,
 } from "../controller/auth.controller.js";
 import {
   registerValidation,
@@ -25,4 +26,5 @@ router.get("/test", (req, res) => {
 router.get("/me", protect, getCurrentUser);
 
 router.post("/logout", logout);
+router.patch("/profile", protect, updateProfile);
 export default router;
