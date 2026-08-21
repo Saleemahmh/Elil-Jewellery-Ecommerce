@@ -15,12 +15,12 @@ const accountLinks = [
   },
   {
     label: "My Orders",
-    path: "/account/orders",
+    path: "/orders",
     icon: FiPackage,
   },
   {
     label: "Wishlist",
-    path: "/account/wishlist",
+    path: "/wishlist",
     icon: FiHeart,
   },
   {
@@ -81,6 +81,7 @@ const AccountSidebar = ({ onLogout }) => {
             <NavLink
               key={item.path}
               to={item.path}
+              end={item.path === "/account"}
               className={({ isActive }) =>
                 `
                 flex

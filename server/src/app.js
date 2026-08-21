@@ -10,6 +10,7 @@ import orderRoutes from "./routes/order.routes.js";
 import dashboardRoutes from "./routes/dashboard.route.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import newsletterRoutes from "./routes/subscriber.routes.js";
+import addressRoutes from "./routes/address.routes.js";
 const app = express();
 
 app.use(
@@ -37,6 +38,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/newsletter", newsletterRoutes);
+app.use("/api/addresses", addressRoutes);
 
 //Test Route
 app.get("/", (req, res) => {

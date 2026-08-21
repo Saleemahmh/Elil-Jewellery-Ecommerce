@@ -14,6 +14,9 @@ import Checkout from "../pages/Checkout/Checkout.jsx";
 import OrderSuccess from "../pages/Checkout/OrderSucess.jsx";
 import AccountDashboard from "../pages/Account/AccountDashboard.jsx";
 import Profile from "../pages/Account/Profile.jsx";
+import MyOrders from "../pages/Account/MyOrders.jsx";
+import OrderDetails from "../pages/Account/OrderDetails.jsx";
+import Addresses from "../pages/Account/Addresses.jsx";
 const AppRoutes = () => {
   const dispatch = useDispatch();
 
@@ -34,6 +37,9 @@ const AppRoutes = () => {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-success/:orderId" element={<OrderSuccess />} />
         <Route path="/account/profile" element={<Profile />} />
+         <Route path="/account/addresses" element={<Addresses />} />
+        <Route path="/orders" element={<MyOrders />} />
+        <Route path="/orders/:id" element={<OrderDetails />} />
       </Route>
     </Routes>
   );

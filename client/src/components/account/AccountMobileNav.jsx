@@ -14,13 +14,13 @@ const accountLinks = [
     icon: FiUser,
   },
   {
-    label: "Orders",
-    path: "/account/orders",
+    label: "My Orders",
+    path: "/orders",
     icon: FiPackage,
   },
   {
     label: "Wishlist",
-    path: "/account/wishlist",
+    path: "/wishlist",
     icon: FiHeart,
   },
   {
@@ -45,6 +45,7 @@ const AccountMobileNav = ({ onLogout }) => {
               <NavLink
                 key={item.path}
                 to={item.path}
+                end={item.path === "/account"}
                 className={({ isActive }) =>
                   `
                   flex
@@ -67,7 +68,10 @@ const AccountMobileNav = ({ onLogout }) => {
                 }
               >
                 <Icon className="text-sm" />
-                <span>{item.label}</span>
+
+                <span>
+                  {item.label}
+                </span>
               </NavLink>
             );
           })}
@@ -108,7 +112,10 @@ const AccountMobileNav = ({ onLogout }) => {
           "
         >
           <FiLogOut className="text-base" />
-          <span>Logout</span>
+
+          <span>
+            Logout
+          </span>
         </button>
       </div>
 

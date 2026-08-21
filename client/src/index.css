@@ -61,3 +61,12 @@ button {
 .breathe {
   animation: breathe 8s ease-in-out infinite alternate;
 }
+@layer components {
+  .form-label {
+    @apply mb-2 block text-sm font-medium text-[#341A36];
+  }
+
+  .form-input {
+    @apply w-full rounded-xl border border-[#E7DED4] bg-[#FDFBF8] px-4 py-3 text-sm text-[#341A36] outline-none transition placeholder:text-[#9B8B98] focus:border-[#C7A05A] focus:ring-1 focus:ring-[#C7A05A];
+  }
+}
