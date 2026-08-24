@@ -5,6 +5,9 @@ import {
   getMyOrders as getMyOrdersService,
   getOrderById as getOrderByIdService,
   cancelOrder as cancelOrderService,
+  getAllOrders as getAllOrdersService,
+  getAdminOrderById as getAdminOrderByIdService,
+  updateOrderStatus as updateOrderStatusService,
 } from "../../services/orderService";
 
 // ======================================================
@@ -86,7 +89,63 @@ export const cancelOrder = createAsyncThunk(
     }
   },
 );
+// ======================================================
+// ADMIN - GET ALL ORDERS
+// ======================================================
 
+export const fetchAllOrders = createAsyncThunk(
+  "orders/fetchAllOrders",
+
+  async (_, thunkAPI) => {
+    try {
+      const data = await getAllOrdersService();
+
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch orders",
+      );
+    }
+  },
+);
+// ======================================================
+// ADMIN - GET SINGLE ORDER
+// ======================================================
+
+export const fetchAdminOrderById = createAsyncThunk(
+  "orders/fetchAdminOrderById",
+
+  async (orderId, thunkAPI) => {
+    try {
+      const data = await getAdminOrderByIdService(orderId);
+
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch order",
+      );
+    }
+  },
+);
+// ======================================================
+// ADMIN - UPDATE ORDER STATUS
+// ======================================================
+
+export const changeOrderStatus = createAsyncThunk(
+  "orders/changeOrderStatus",
+
+  async ({ orderId, status }, thunkAPI) => {
+    try {
+      const data = await updateOrderStatusService(orderId, status);
+
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to update order status",
+      );
+    }
+  },
+);
 // ======================================================
 // INITIAL STATE
 // ======================================================
@@ -107,6 +166,13 @@ const initialState = {
   cancelling: false,
 
   cancelError: null,
+
+  // Admin
+  adminLoading: false,
+  adminError: null,
+
+  updatingStatus: false,
+  statusError: null,
 };
 
 // ======================================================
@@ -232,6 +298,60 @@ const orderSlice = createSlice({
         state.cancelling = false;
 
         state.cancelError = action.payload || "Failed to cancel order";
+      })
+      // ============================================
+      // ADMIN - FETCH SINGLE ORDER
+      // ============================================
+
+      .addCase(fetchAdminOrderById.pending, (state) => {
+        state.adminLoading = true;
+        state.adminError = null;
+        state.selectedOrder = null;
+      })
+
+      .addCase(fetchAdminOrderById.fulfilled, (state, action) => {
+        state.adminLoading = false;
+        state.adminError = null;
+
+        state.selectedOrder = action.payload.order || null;
+      })
+
+      .addCase(fetchAdminOrderById.rejected, (state, action) => {
+        state.adminLoading = false;
+
+        state.adminError = action.payload || "Failed to fetch order";
+
+        state.selectedOrder = null;
+      })
+
+      // ============================================
+      // ADMIN - UPDATE ORDER STATUS
+      // ============================================
+
+      .addCase(changeOrderStatus.pending, (state) => {
+        state.updatingStatus = true;
+        state.statusError = null;
+      })
+
+      .addCase(changeOrderStatus.fulfilled, (state, action) => {
+        state.updatingStatus = false;
+        state.statusError = null;
+
+        const updatedOrder = action.payload.order;
+
+        if (updatedOrder) {
+          state.selectedOrder = updatedOrder;
+
+          state.orders = state.orders.map((order) =>
+            order._id === updatedOrder._id ? updatedOrder : order,
+          );
+        }
+      })
+
+      .addCase(changeOrderStatus.rejected, (state, action) => {
+        state.updatingStatus = false;
+
+        state.statusError = action.payload || "Failed to update order status";
       });
   },
 });

@@ -3,11 +3,11 @@ import { Link, NavLink } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 
-import { resetCart, fetchCart } from "../../redux/slices/cartSlice";
+import { resetCart, fetchCart } from "../redux/slices/cartSlice.js";
 import {
   clearWishlist,
   fetchWishlist,
-} from "../../redux/slices/wishlistSlice";
+} from "../redux/slices/wishlistSlice.js";
 
 import toast from "react-hot-toast";
 
@@ -21,12 +21,12 @@ import {
   FiX,
 } from "react-icons/fi";
 
-import Container from "../common/Container";
-import CartDrawer from "../cart/CartDrawer";
+import Container from "../components/common/Container.jsx";
+import CartDrawer from "../components/cart/CartDrawer.jsx";
 
-import logo from "../../assets/logo/Logo-revised_v1.png";
+import logo from "../assets/logo/Logo-revised_v1.png";
 
-import { logout } from "../../redux/slices/authSlice";
+import { logout } from "../redux/slices/authSlice.js";
 
 const navItems = [
   "Home",
@@ -295,21 +295,13 @@ const Navbar = () => {
 
            {isAuthenticated ? (
   <Link
-    to={
-      user?.role === "admin"
-        ? "/admin"
-        : "/account"
-    }
-    aria-label={
-      user?.role === "admin"
-        ? "Admin Dashboard"
-        : "My Account"
-    }
-    title={
-      user?.role === "admin"
-        ? "Admin Dashboard"
-        : `${user.fullName}`
-    }
+    to="/account"
+    aria-label="My Account"
+    title={`My Account${
+      user?.fullName
+        ? ` (${user.fullName})`
+        : ""
+    }`}
     className="
       hidden
       sm:block

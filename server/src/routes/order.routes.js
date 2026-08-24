@@ -7,6 +7,7 @@ import {
   cancelOrder,
   getAllOrders,
   updateOrderStatus,
+  getAdminOrder,
 } from "../controller/order.controller.js";
 
 import protect from "../middleware/auth.middleware.js";
@@ -48,5 +49,7 @@ router.patch(
   validateRequest,
   updateOrderStatus,
 );
+// Admin - Single Order
+router.get("/admin/:id", protect, authorize("admin"), getAdminOrder);
 
 export default router;

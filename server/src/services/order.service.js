@@ -150,7 +150,7 @@ export const cancelOrder = async (orderId, userId) => {
 // Admin - Get All Orders
 
 export const getAllOrders = async () => {
-  return await Order.find().populate("user", "name email").sort({
+  return await Order.find().populate("user", "fullName email").sort({
     createdAt: -1,
   });
 };
@@ -167,6 +167,20 @@ export const updateOrderStatus = async (orderId, status) => {
   order.orderStatus = status;
 
   await order.save();
+
+  return order;
+};
+
+// Admin - Get Single Order
+export const getAdminOrderById = async (orderId) => {
+  const order = await Order.findById(orderId).populate(
+    "user",
+    "fullName email",
+  );
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
 
   return order;
 };

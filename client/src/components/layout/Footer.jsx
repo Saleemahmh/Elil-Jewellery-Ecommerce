@@ -9,14 +9,6 @@ import { FiMapPin, FiPhone, FiMail } from "react-icons/fi";
 
 import Container from "../common/Container";
 
-/**
- * Assumes this lives at src/components/layout/Footer.jsx, so
- * "../common/Container" is one level up into components/common/.
- * Adjust if placed elsewhere.
- *
- * Swap the href="#" placeholders (social links, policy pages) for
- * your real URLs/routes once they exist.
- */
 
 const quickLinks = [
   { label: "Home", to: "/" },
@@ -138,7 +130,7 @@ const Footer = () => {
                   href="tel:+911234567890"
                   className="text-[#C9BFC6] text-sm hover:text-[#E6C37A] transition-colors duration-300"
                 >
-                  +91 12345 67890
+                  +91 9994532455
                 </a>
               </li>
               <li className="flex items-center gap-3">
@@ -147,7 +139,7 @@ const Footer = () => {
                   href="mailto:hello@elil.com"
                   className="text-[#C9BFC6] text-sm hover:text-[#E6C37A] transition-colors duration-300"
                 >
-                  hello@elil.com
+                  vys.business@gmail.com
                 </a>
               </li>
             </ul>

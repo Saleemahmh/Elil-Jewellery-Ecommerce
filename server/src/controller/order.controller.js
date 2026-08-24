@@ -5,6 +5,7 @@ import {
   cancelOrder as cancelOrderService,
   getAllOrders as getAllOrdersService,
   updateOrderStatus as updateOrderStatusService,
+  getAdminOrderById as getAdminOrderByIdService,
 } from "../services/order.service.js";
 
 // Create Order
@@ -116,6 +117,23 @@ export const updateOrderStatus = async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Admin - Get Single Order
+export const getAdminOrder = async (req, res) => {
+  try {
+    const order = await getAdminOrderByIdService(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    return res.status(404).json({
       success: false,
       message: error.message,
     });
