@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 
 import { fetchCurrentUser } from "../redux/slices/authSlice.js";
 import Home from "../pages/Home/Home.jsx";
+import Unsubscribe from "../components/home/Newsletter/Unsubscribe.jsx"
 import MainLayout from "../layouts/MainLayout.jsx";
 import Shop from "../pages/Shop/Shop.jsx";
 import Auth from "../pages/auth/Auth.jsx";
@@ -22,6 +23,10 @@ import AdminLayout from "../layouts/AdminLayout.jsx";
 import AdminDashboard from "../pages/Admin/AdminDashboard.jsx";
 import AdminOrders from "../pages/Admin/AdminOrders.jsx";
 import AdminOrderDetails from "../pages/Admin/AdminOrderDetails";
+import AdminProducts from "../pages/Admin/AdminProducts.jsx";
+import AdminProductForm from "../pages/Admin/AdminProductForm.jsx";
+import AdminProductEdit from "../pages/Admin/AdminProductEdit.jsx";
+import AdminCategories from "../pages/Admin/AdminCategories.jsx";
 const AppRoutes = () => {
   const dispatch = useDispatch();
 
@@ -32,6 +37,7 @@ const AppRoutes = () => {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+         <Route path="/unsubscribe/:token" element={<Unsubscribe />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/account" element={<AccountDashboard />} />
         <Route path="/login" element={<Auth />} />
@@ -52,6 +58,10 @@ const AppRoutes = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/products/new" element={<AdminProductForm />} />
+          <Route path="/admin/products/:id/edit" element={<AdminProductEdit />}/>
+          <Route path="/admin/categories" element={<AdminCategories />}/> 
         </Route>
       </Route>
     </Routes>

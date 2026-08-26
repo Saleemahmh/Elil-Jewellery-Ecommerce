@@ -8,6 +8,7 @@ import orderReducer from "./slices/orderSlice";
 import addressReducer from "./slices/addressSlice";
 import adminDashboardReducer from "./slices/adminDashboardSlice";
 import adminOrderReducer from "./slices/adminOrderSlice";
+import adminProductReducer from "./slices/adminProductSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,5 +21,6 @@ export const store = configureStore({
     adminOrders: adminOrderReducer,
     adminDashboard: adminDashboardReducer,
     addresses: addressReducer,
+    adminProducts: adminProductReducer,
   },
 });

@@ -4,6 +4,7 @@ import {
   createProduct,
   getProducts,
   getProduct,
+  getAdminProduct,
   updateProduct,
   deleteProduct,
 } from "../controller/product.controller.js";
@@ -29,7 +30,7 @@ router.post(
   validateRequest,
   createProduct,
 );
-
+router.get("/admin/:id", protect, authorize("admin"), getAdminProduct);
 router.get("/", protectOptional, getProducts);
 
 router.get("/:slug", getProduct);

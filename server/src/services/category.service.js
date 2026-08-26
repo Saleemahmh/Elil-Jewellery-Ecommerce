@@ -15,7 +15,9 @@ export const createCategory = async (categoryData) => {
 };
 
 export const getAllCategories = async () => {
-  return await Category.find().sort({ createdAt: -1 });
+  return await Category.find({
+    status: "active",
+  }).sort({ createdAt: -1 });
 };
 
 export const getCategoryById = async (id) => {

@@ -79,6 +79,22 @@ export const getProduct = async (req, res) => {
     });
   }
 };
+//admin by id
+export const getAdminProduct = async (req, res) => {
+  try {
+    const product = await getProductByIdService(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 export const updateProduct = async (req, res) => {
   try {

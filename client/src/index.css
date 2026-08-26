@@ -70,3 +70,18 @@ button {
     @apply w-full rounded-xl border border-[#E7DED4] bg-[#FDFBF8] px-4 py-3 text-sm text-[#341A36] outline-none transition placeholder:text-[#9B8B98] focus:border-[#C7A05A] focus:ring-1 focus:ring-[#C7A05A];
   }
 }
+.admin-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #e7ded4;
+  background: #fdfbf8;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #341a36;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.admin-input:focus {
+  border-color: #c7a05a;
+}
