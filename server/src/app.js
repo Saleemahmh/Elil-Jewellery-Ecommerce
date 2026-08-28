@@ -11,6 +11,7 @@ import dashboardRoutes from "./routes/dashboard.route.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import newsletterRoutes from "./routes/subscriber.routes.js";
 import addressRoutes from "./routes/address.routes.js";
+import adminCustomerRoutes from "./routes/adminCustomer.routes.js";
 const app = express();
 
 app.use(
@@ -39,7 +40,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/addresses", addressRoutes);
-
+app.use("/api/admin/customers", adminCustomerRoutes);
 //Test Route
 app.get("/", (req, res) => {
   res.json({
