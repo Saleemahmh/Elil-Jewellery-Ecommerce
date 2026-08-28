@@ -12,6 +12,7 @@ import wishlistRoutes from "./routes/wishlist.routes.js";
 import newsletterRoutes from "./routes/subscriber.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import adminCustomerRoutes from "./routes/adminCustomer.routes.js";
+import collectionRoutes from "./routes/collection.routes.js";
 const app = express();
 
 app.use(
@@ -41,6 +42,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/admin/customers", adminCustomerRoutes);
+app.use("/api/collections", collectionRoutes);
 //Test Route
 app.get("/", (req, res) => {
   res.json({

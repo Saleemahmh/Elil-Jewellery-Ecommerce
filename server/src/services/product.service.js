@@ -18,6 +18,7 @@ export const getAllProducts = async (queryParams, userId = null) => {
   const {
     search,
     category,
+    collection,
     featured,
     bestSeller,
     newArrival,
@@ -41,6 +42,10 @@ export const getAllProducts = async (queryParams, userId = null) => {
 
   if (category) {
     filter.category = category;
+  }
+  //collection
+  if (collection) {
+    filter.collection = collection;
   }
   //featured
 
@@ -108,6 +113,7 @@ export const getAllProducts = async (queryParams, userId = null) => {
   const totalProducts = await Product.countDocuments(filter);
   const products = await Product.find(filter)
     .populate("category")
+    .populate("collection")
     .sort(sortOption)
     .skip(skip)
     .limit(Number(limit));
