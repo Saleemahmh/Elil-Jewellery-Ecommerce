@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,7 +16,6 @@ import {
   FiHeart,
   FiShoppingBag,
   FiUser,
-  FiLogOut,
   FiMenu,
   FiX,
 } from "react-icons/fi";
@@ -38,6 +37,13 @@ const navItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+
+  // ================= SEARCH STATE =================
+
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -61,6 +67,39 @@ const Navbar = () => {
       dispatch(fetchWishlist());
     }
   }, [dispatch, isAuthenticated]);
+
+  // ================= SEARCH =================
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+
+    const trimmedSearch = searchTerm.trim();
+
+    if (!trimmedSearch) {
+      return;
+    }
+
+    navigate(
+      `/shop?search=${encodeURIComponent(trimmedSearch)}`
+    );
+
+    setSearchTerm("");
+    setSearchOpen(false);
+    setIsOpen(false);
+  };
+
+  // ================= OPEN SEARCH =================
+
+  const openSearch = () => {
+    setSearchOpen(true);
+  };
+
+  // ================= CLOSE SEARCH =================
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchTerm("");
+  };
 
   // ================= LOGOUT =================
 
@@ -98,7 +137,7 @@ const Navbar = () => {
       "
     >
       <Container>
-        <nav className="flex items-center justify-between h-24">
+        <nav className="relative flex items-center justify-between h-24">
 
           {/* ================================================= */}
           {/* LOGO */}
@@ -169,12 +208,15 @@ const Navbar = () => {
             "
           >
 
-            {/* SEARCH */}
+            {/* ================================================= */}
+            {/* DESKTOP SEARCH */}
+            {/* ================================================= */}
 
             <button
               type="button"
               aria-label="Search"
               title="Search"
+              onClick={openSearch}
               className="
                 hidden
                 sm:block
@@ -204,136 +246,137 @@ const Navbar = () => {
             </Link>
 
             {/* ================================================= */}
-{/* CART — DESKTOP */}
-{/* ================================================= */}
-
-<Link
-  to="/cart"
-  aria-label="Shopping Cart"
-  title="Shopping Cart"
-  className="
-    hidden
-    lg:flex
-    relative
-    hover:text-[#C7A05A]
-    transition-colors
-  "
->
-  <FiShoppingBag />
-
-  {isAuthenticated && totalItems > 0 && (
-    <span
-      className="
-        absolute
-        -top-2
-        -right-2
-        flex
-        items-center
-        justify-center
-        min-w-[18px]
-        h-[18px]
-        px-1
-        rounded-full
-        bg-[#C7A05A]
-        text-white
-        text-[10px]
-        font-medium
-        leading-none
-      "
-    >
-      {totalItems}
-    </span>
-  )}
-</Link>
-
-{/* ================================================= */}
-{/* CART — MOBILE */}
-{/* ================================================= */}
-
-<button
-  type="button"
-  aria-label="Open Shopping Cart"
-  title="Shopping Cart"
-  onClick={() => setCartOpen(true)}
-  className="
-    relative
-    flex
-    lg:hidden
-    hover:text-[#C7A05A]
-    transition-colors
-  "
->
-  <FiShoppingBag />
-
-  {isAuthenticated && totalItems > 0 && (
-    <span
-      className="
-        absolute
-        -top-2
-        -right-2
-        flex
-        items-center
-        justify-center
-        min-w-[18px]
-        h-[18px]
-        px-1
-        rounded-full
-        bg-[#C7A05A]
-        text-white
-        text-[10px]
-        font-medium
-        leading-none
-      "
-    >
-      {totalItems}
-    </span>
-  )}
-</button>
-            {/* ================================================= */}
-            {/* ACCOUNT / LOGOUT */}
+            {/* CART — DESKTOP */}
             {/* ================================================= */}
 
-           {isAuthenticated ? (
-  <Link
-    to={
-      user?.role === "admin"
-        ? "/admin"
-        : "/account"
-    }
-    aria-label={
-      user?.role === "admin"
-        ? "Admin Dashboard"
-        : "My Account"
-    }
-    title={
-      user?.role === "admin"
-        ? "Admin Dashboard"
-        : `${user.fullName}`
-    }
-    className="
-      hidden
-      sm:block
-      hover:text-[#C7A05A]
-      transition-colors
-    "
-  >
-    <FiUser />
-  </Link>
-) : (
-  <Link
-    to="/login"
-    aria-label="Sign In"
-    title="Sign In"
-    className="
-      hidden
-      sm:block
-      hover:text-[#C7A05A]
-      transition-colors
-    "
-  >
-    <FiUser />
-  </Link>
-)}
+            <Link
+              to="/cart"
+              aria-label="Shopping Cart"
+              title="Shopping Cart"
+              className="
+                hidden
+                lg:flex
+                relative
+                hover:text-[#C7A05A]
+                transition-colors
+              "
+            >
+              <FiShoppingBag />
+
+              {isAuthenticated && totalItems > 0 && (
+                <span
+                  className="
+                    absolute
+                    -top-2
+                    -right-2
+                    flex
+                    items-center
+                    justify-center
+                    min-w-[18px]
+                    h-[18px]
+                    px-1
+                    rounded-full
+                    bg-[#C7A05A]
+                    text-white
+                    text-[10px]
+                    font-medium
+                    leading-none
+                  "
+                >
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+
+            {/* ================================================= */}
+            {/* CART — MOBILE */}
+            {/* ================================================= */}
+
+            <button
+              type="button"
+              aria-label="Open Shopping Cart"
+              title="Shopping Cart"
+              onClick={() => setCartOpen(true)}
+              className="
+                relative
+                flex
+                lg:hidden
+                hover:text-[#C7A05A]
+                transition-colors
+              "
+            >
+              <FiShoppingBag />
+
+              {isAuthenticated && totalItems > 0 && (
+                <span
+                  className="
+                    absolute
+                    -top-2
+                    -right-2
+                    flex
+                    items-center
+                    justify-center
+                    min-w-[18px]
+                    h-[18px]
+                    px-1
+                    rounded-full
+                    bg-[#C7A05A]
+                    text-white
+                    text-[10px]
+                    font-medium
+                    leading-none
+                  "
+                >
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
+            {/* ================================================= */}
+            {/* ACCOUNT */}
+            {/* ================================================= */}
+
+            {isAuthenticated ? (
+              <Link
+                to={
+                  user?.role === "admin"
+                    ? "/admin"
+                    : "/account"
+                }
+                aria-label={
+                  user?.role === "admin"
+                    ? "Admin Dashboard"
+                    : "My Account"
+                }
+                title={
+                  user?.role === "admin"
+                    ? "Admin Dashboard"
+                    : `${user.fullName}`
+                }
+                className="
+                  hidden
+                  sm:block
+                  hover:text-[#C7A05A]
+                  transition-colors
+                "
+              >
+                <FiUser />
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                aria-label="Sign In"
+                title="Sign In"
+                className="
+                  hidden
+                  sm:block
+                  hover:text-[#C7A05A]
+                  transition-colors
+                "
+              >
+                <FiUser />
+              </Link>
+            )}
 
             {/* ================================================= */}
             {/* MOBILE MENU BUTTON */}
@@ -353,6 +396,98 @@ const Navbar = () => {
             </button>
 
           </div>
+
+          {/* ================================================= */}
+          {/* DESKTOP SEARCH PANEL */}
+          {/* ================================================= */}
+
+          <AnimatePresence>
+            {searchOpen && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: -10,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -10,
+                }}
+                transition={{
+                  duration: 0.25,
+                }}
+                className="
+                  absolute
+                  top-full
+                  right-0
+                  mt-3
+                  hidden
+                  sm:block
+                  z-50
+                  w-[320px]
+                  sm:w-[380px]
+                "
+              >
+                <form
+                  onSubmit={handleSearch}
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                    bg-[#F7F2EB]
+                    border
+                    border-[#E7DED4]
+                    shadow-xl
+                    rounded-full
+                    px-5
+                    py-3
+                  "
+                >
+                  <FiSearch
+                    className="
+                      flex-shrink-0
+                      text-[#C7A05A]
+                    "
+                  />
+
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(event) =>
+                      setSearchTerm(event.target.value)
+                    }
+                    autoFocus
+                    placeholder="Search jewellery..."
+                    className="
+                      flex-1
+                      bg-transparent
+                      outline-none
+                      text-sm
+                      text-[#4A294B]
+                      placeholder:text-[#9A8D86]
+                    "
+                  />
+
+                  <button
+                    type="button"
+                    onClick={closeSearch}
+                    aria-label="Close search"
+                    className="
+                      text-[#7A6E68]
+                      hover:text-[#C7A05A]
+                      transition-colors
+                    "
+                  >
+                    <FiX />
+                  </button>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
         </nav>
       </Container>
 
@@ -465,6 +600,51 @@ const Navbar = () => {
                 "
               />
 
+              {/* ================================================= */}
+              {/* MOBILE SEARCH */}
+              {/* ================================================= */}
+
+              <form
+                onSubmit={handleSearch}
+                className="
+                  mt-8
+                  flex
+                  items-center
+                  gap-3
+                  border
+                  border-white/20
+                  rounded-full
+                  px-4
+                  py-3
+                  text-[#F7F2EB]
+                "
+              >
+                <FiSearch
+                  className="
+                    flex-shrink-0
+                    text-[#C7A05A]
+                  "
+                />
+
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(event) =>
+                    setSearchTerm(event.target.value)
+                  }
+                  placeholder="Search jewellery..."
+                  className="
+                    flex-1
+                    min-w-0
+                    bg-transparent
+                    outline-none
+                    text-sm
+                    text-[#F7F2EB]
+                    placeholder:text-[#B9AEB7]
+                  "
+                />
+              </form>
+
               {/* MOBILE NAV LINKS */}
 
               <ul className="mt-10 flex flex-col gap-7">
@@ -518,7 +698,9 @@ const Navbar = () => {
 
               </ul>
 
+              {/* ================================================= */}
               {/* MOBILE SECONDARY ICONS */}
+              {/* ================================================= */}
 
               <div
                 className="
@@ -538,6 +720,10 @@ const Navbar = () => {
 
                 <button
                   type="button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setIsOpen(false);
+                  }}
                   aria-label="Search"
                   title="Search"
                   className="
@@ -607,35 +793,51 @@ const Navbar = () => {
                     )}
                 </button>
 
-                {/* MOBILE ACCOUNT / LOGOUT */}
+                {/* MOBILE ACCOUNT */}
 
-               {isAuthenticated ? (
-  <Link
-    to="/account"
-    onClick={() => setIsOpen(false)}
-    aria-label="My Account"
-    title="My Account"
-    className="
-      hover:text-[#C7A05A]
-      transition-colors
-    "
-  >
-    <FiUser />
-  </Link>
-) : (
-  <Link
-    to="/login"
-    onClick={() => setIsOpen(false)}
-    aria-label="Sign In"
-    title="Sign In"
-    className="
-      hover:text-[#C7A05A]
-      transition-colors
-    "
-  >
-    <FiUser />
-  </Link>
-)}
+                {isAuthenticated ? (
+                  <Link
+                    to={
+                      user?.role === "admin"
+                        ? "/admin"
+                        : "/account"
+                    }
+                    onClick={() =>
+                      setIsOpen(false)
+                    }
+                    aria-label={
+                      user?.role === "admin"
+                        ? "Admin Dashboard"
+                        : "My Account"
+                    }
+                    title={
+                      user?.role === "admin"
+                        ? "Admin Dashboard"
+                        : "My Account"
+                    }
+                    className="
+                      hover:text-[#C7A05A]
+                      transition-colors
+                    "
+                  >
+                    <FiUser />
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() =>
+                      setIsOpen(false)
+                    }
+                    aria-label="Sign In"
+                    title="Sign In"
+                    className="
+                      hover:text-[#C7A05A]
+                      transition-colors
+                    "
+                  >
+                    <FiUser />
+                  </Link>
+                )}
 
               </div>
 

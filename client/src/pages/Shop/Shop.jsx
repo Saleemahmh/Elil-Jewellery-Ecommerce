@@ -18,6 +18,7 @@ const Shop = () => {
 
 const categoryFromUrl = searchParams.get("category");
 const newArrivalFromUrl = searchParams.get("newArrival");
+const searchFromUrl = searchParams.get("search");
 
 // NEW — same pattern as the two above, extended to cover the
 // Price Edit pills ("Under ₹2,000" etc. → /shop?maxPrice=2000)
@@ -39,6 +40,7 @@ const sortFromUrl = searchParams.get("sort");
   // =========================================
 
  const [filters, setFilters] = useState({
+  search: searchFromUrl || "",
   category: categoryFromUrl || "",
   collection: collectionFromUrl || "",
   minPrice: minPriceFromUrl || "",
@@ -46,6 +48,7 @@ const sortFromUrl = searchParams.get("sort");
   availability: availabilityFromUrl || "",
   sort: sortFromUrl || "newest",
   newArrival: newArrivalFromUrl === "true" ? "true" : "",
+
 });
 
   // =========================================
@@ -70,7 +73,10 @@ const sortFromUrl = searchParams.get("sort");
       page: 1,
       limit: 10,
     };
-
+    //Search
+    if (filters.search) {
+  params.search = filters.search;
+}
     // Category
     if (filters.category) {
       params.category = filters.category;
@@ -133,6 +139,7 @@ const sortFromUrl = searchParams.get("sort");
 
  const handleClearFilters = () => {
   setFilters({
+    search:"",
     category: "",
     collection: "",
     minPrice: "",
@@ -153,7 +160,7 @@ const sortFromUrl = searchParams.get("sort");
       sort,
     }));
   };
-
+useEffect(() => { setFilters({ search: searchParams.get("search") || "", category: searchParams.get("category") || "", collection: searchParams.get("collection") || "", minPrice: searchParams.get("minPrice") || "", maxPrice: searchParams.get("maxPrice") || "", availability: searchParams.get("availability") || "", sort: searchParams.get("sort") || "newest", newArrival: searchParams.get("newArrival") === "true" ? "true" : "", }); }, [searchParams]);
   // =========================================
   // MOBILE FILTER OPEN
   // =========================================
