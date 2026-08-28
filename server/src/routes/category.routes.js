@@ -6,8 +6,9 @@ import {
   getCategory,
   updateCategory,
   deleteCategory,
+  getAdminCategories,
 } from "../controller/category.controller.js";
-
+import upload from "../middleware/upload.middleware.js";
 import {
   createCategoryValidation,
   updateCategoryValidation,
@@ -28,6 +29,7 @@ router.post(
   "/",
   protect,
   authorize("admin"),
+  upload.single("image"),
   createCategoryValidation,
   validateRequest,
   createCategory,
@@ -39,7 +41,12 @@ router.post(
  * @access  Public
  */
 router.get("/", getCategories);
-
+/**
+ * @route   GET /api/categories/admin
+ * @desc    Get a single category
+ * @access  Admin
+ */
+router.get("/admin", protect, authorize("admin"), getAdminCategories);
 /**
  * @route   GET /api/categories/:id
  * @desc    Get a single category
@@ -56,6 +63,7 @@ router.patch(
   "/:id",
   protect,
   authorize("admin"),
+  upload.single("image"),
   updateCategoryValidation,
   validateRequest,
   updateCategory,

@@ -17,10 +17,7 @@ export const getAdminProducts = async (params = {}) => {
 // ============================================
 
 export const getAdminProductById = async (id) => {
-  // The backend currently exposes product details by slug,
-  // so the admin will initially receive the product using
-  // the existing product list data.
-  const response = await api.get(`/products/${id}`);
+  const response = await api.get(`/products/admin/${id}`);
 
   return response.data;
 };

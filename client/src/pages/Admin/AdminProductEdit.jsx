@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,10 +10,18 @@ import {
   updateProduct,
 } from "../../redux/slices/adminProductSlice.js";
 
+import {
+  fetchCategories,
+} from "../../redux/slices/categorySlice.js";
+
 const AdminProductEdit = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
+
+  // =====================================================
+  // PRODUCT STATE
+  // =====================================================
 
   const {
     selectedProduct,
@@ -20,6 +29,20 @@ const AdminProductEdit = () => {
     selectedProductError,
     updating,
   } = useSelector((state) => state.adminProducts);
+
+  // =====================================================
+  // CATEGORY STATE
+  // =====================================================
+
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useSelector((state) => state.categories);
+
+  // =====================================================
+  // FORM STATE
+  // =====================================================
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,13 +62,15 @@ const AdminProductEdit = () => {
   const [newImages, setNewImages] = useState([]);
 
   // =====================================================
-  // FETCH PRODUCT
+  // FETCH PRODUCT + CATEGORIES
   // =====================================================
 
   useEffect(() => {
     if (id) {
       dispatch(fetchAdminProductById(id));
     }
+
+    dispatch(fetchCategories());
   }, [dispatch, id]);
 
   // =====================================================
@@ -59,7 +84,8 @@ const AdminProductEdit = () => {
       name: selectedProduct.name || "",
       shortDescription:
         selectedProduct.shortDescription || "",
-      description: selectedProduct.description || "",
+      description:
+        selectedProduct.description || "",
       price: selectedProduct.price ?? "",
       discountPrice:
         selectedProduct.discountPrice ?? "",
@@ -134,6 +160,42 @@ const AdminProductEdit = () => {
   };
 
   // =====================================================
+  // ACTIVE CATEGORIES
+  // =====================================================
+
+  /*
+   * Only active categories should normally be available
+   * for assigning to a product.
+   *
+   * If the product currently belongs to an inactive
+   * category, we keep that category in the dropdown so
+   * editing the product does not accidentally remove it.
+   */
+
+  const activeCategories = categories.filter(
+    (category) => category.status === "active",
+  );
+
+  const selectedCategory = categories.find(
+    (category) =>
+      category._id === formData.category,
+  );
+
+  const selectedCategoryIsInactive =
+    selectedCategory &&
+    selectedCategory.status !== "active";
+
+  const categoryOptions = selectedCategoryIsInactive
+    ? [
+        selectedCategory,
+        ...activeCategories.filter(
+          (category) =>
+            category._id !== selectedCategory._id,
+        ),
+      ]
+    : activeCategories;
+
+  // =====================================================
   // SUBMIT
   // =====================================================
 
@@ -143,34 +205,50 @@ const AdminProductEdit = () => {
     const data = new FormData();
 
     data.append("name", formData.name);
+
     data.append(
       "shortDescription",
       formData.shortDescription,
     );
+
     data.append(
       "description",
       formData.description,
     );
+
     data.append("price", formData.price);
+
     data.append(
       "discountPrice",
       formData.discountPrice || 0,
     );
-    data.append("category", formData.category);
+
+    data.append(
+      "category",
+      formData.category,
+    );
+
     data.append("stock", formData.stock);
+
     data.append(
       "featured",
       formData.featured,
     );
+
     data.append(
       "bestSeller",
       formData.bestSeller,
     );
+
     data.append(
       "newArrival",
       formData.newArrival,
     );
-    data.append("status", formData.status);
+
+    data.append(
+      "status",
+      formData.status,
+    );
 
     /*
      * IMPORTANT:
@@ -426,6 +504,128 @@ const AdminProductEdit = () => {
                   focus:border-[#C7A05A]
                 "
               />
+            </div>
+
+            {/* CATEGORY */}
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#341A36]">
+                Category
+              </label>
+
+              <div className="flex gap-3">
+
+                {/* CATEGORY IMAGE */}
+
+                {selectedCategory?.image?.url ? (
+                  <div
+                    className="
+                      flex
+                      h-[50px]
+                      w-[50px]
+                      shrink-0
+                      items-center
+                      justify-center
+                      overflow-hidden
+                      rounded-xl
+                      border
+                      border-[#E7DED4]
+                      bg-[#F7F2EB]
+                    "
+                  >
+                    <img
+                      src={selectedCategory.image.url}
+                      alt={selectedCategory.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="
+                      flex
+                      h-[50px]
+                      w-[50px]
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-xl
+                      border
+                      border-[#E7DED4]
+                      bg-[#F7F2EB]
+                      text-xs
+                      text-[#9A8A95]
+                    "
+                  >
+                    —
+                  </div>
+                )}
+
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                  disabled={categoriesLoading}
+                  className="
+                    w-full
+                    rounded-xl
+                    border
+                    border-[#E7DED4]
+                    bg-[#FDFBF8]
+                    px-4
+                    py-3
+                    text-sm
+                    text-[#341A36]
+                    outline-none
+                    focus:border-[#C7A05A]
+                    disabled:cursor-not-allowed
+                    disabled:opacity-60
+                  "
+                >
+                  <option value="">
+                    {categoriesLoading
+                      ? "Loading categories..."
+                      : "Select a category"}
+                  </option>
+
+                  {categoryOptions.map(
+                    (category) => (
+                      <option
+                        key={category._id}
+                        value={category._id}
+                      >
+                        {category.name}
+                        {category.status !== "active"
+                          ? " (Inactive)"
+                          : ""}
+                      </option>
+                    ),
+                  )}
+                </select>
+
+              </div>
+
+              {categoriesError && (
+                <p className="mt-2 text-xs text-red-500">
+                  {categoriesError}
+                </p>
+              )}
+
+              {!categoriesLoading &&
+                !categoriesError &&
+                activeCategories.length === 0 && (
+                  <p className="mt-2 text-xs text-[#9A8A95]">
+                    No active categories are available.
+                  </p>
+                )}
+
+              {selectedCategoryIsInactive && (
+                <p className="mt-2 text-xs text-amber-600">
+                  This product is currently assigned to an
+                  inactive category. You can select an active
+                  category to change it.
+                </p>
+              )}
             </div>
 
           </div>

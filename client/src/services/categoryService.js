@@ -17,7 +17,15 @@ export const getCategoryById = async (id) => {
 
   return response.data;
 };
+// ======================================================
+// GET ALL CATEGORIES - ADMIN
+// ======================================================
 
+export const getAdminCategories = async () => {
+  const response = await api.get("/categories/admin");
+
+  return response.data;
+};
 // ============================================
 // CREATE CATEGORY
 // ============================================

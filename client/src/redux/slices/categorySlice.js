@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   getCategories,
   getCategoryById,
+  getAdminCategories,
   createCategory as createCategoryService,
   updateCategory as updateCategoryService,
   deleteCategory as deleteCategoryService,
@@ -25,7 +26,23 @@ export const fetchCategories = createAsyncThunk(
     }
   },
 );
+// ======================================================
+// FETCH ALL CATEGORIES - ADMIN
+// ======================================================
 
+export const fetchAdminCategories = createAsyncThunk(
+  "categories/fetchAdminCategories",
+
+  async (_, thunkAPI) => {
+    try {
+      return await getAdminCategories();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch admin categories",
+      );
+    }
+  },
+);
 // ======================================================
 // FETCH SINGLE CATEGORY
 // ======================================================
@@ -157,8 +174,9 @@ const categorySlice = createSlice({
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
 
-        state.categories =
-          action.payload.categories || action.payload.data || [];
+        //state.categories =
+        //action.payload.categories || action.payload.data || [];
+        state.categories = action.payload.categories || [];
       })
 
       .addCase(fetchCategories.rejected, (state, action) => {
@@ -270,6 +288,22 @@ const categorySlice = createSlice({
         state.deleting = false;
 
         state.deleteError = action.payload || "Failed to delete category";
+      })
+      .addCase(fetchAdminCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(fetchAdminCategories.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.categories = action.payload.categories || [];
+      })
+
+      .addCase(fetchAdminCategories.rejected, (state, action) => {
+        state.loading = false;
+
+        state.error = action.payload || "Failed to fetch categories";
       });
   },
 });

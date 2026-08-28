@@ -52,3 +52,9 @@ export const deleteCategory = async (id) => {
 
   return category;
 };
+
+//admin
+
+export const getAllCategoriesAdmin = async () => {
+  return await Category.find().sort({ createdAt: -1 });
+};
