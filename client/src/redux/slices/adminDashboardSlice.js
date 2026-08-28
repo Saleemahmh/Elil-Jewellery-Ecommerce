@@ -4,14 +4,15 @@ import {
   getDashboardStats,
   getRecentOrders,
   getMonthlySales,
-} from "../../services/adminDashboardService";
+} from "../../services/adminDashboardService.js";
 
-// ==========================================
-// FETCH STATS
-// ==========================================
+// ======================================================
+// FETCH DASHBOARD STATS
+// ======================================================
 
 export const fetchDashboardStats = createAsyncThunk(
-  "adminDashboard/fetchStats",
+  "adminDashboard/fetchDashboardStats",
+
   async (_, thunkAPI) => {
     try {
       return await getDashboardStats();
@@ -23,12 +24,13 @@ export const fetchDashboardStats = createAsyncThunk(
   },
 );
 
-// ==========================================
+// ======================================================
 // FETCH RECENT ORDERS
-// ==========================================
+// ======================================================
 
 export const fetchRecentOrders = createAsyncThunk(
   "adminDashboard/fetchRecentOrders",
+
   async (_, thunkAPI) => {
     try {
       return await getRecentOrders();
@@ -40,12 +42,13 @@ export const fetchRecentOrders = createAsyncThunk(
   },
 );
 
-// ==========================================
+// ======================================================
 // FETCH MONTHLY SALES
-// ==========================================
+// ======================================================
 
 export const fetchMonthlySales = createAsyncThunk(
   "adminDashboard/fetchMonthlySales",
+
   async (_, thunkAPI) => {
     try {
       return await getMonthlySales();
@@ -57,27 +60,36 @@ export const fetchMonthlySales = createAsyncThunk(
   },
 );
 
-// ==========================================
+// ======================================================
 // INITIAL STATE
-// ==========================================
+// ======================================================
 
 const initialState = {
-  stats: null,
+  stats: {
+    totalProducts: 0,
+    totalCustomers: 0,
+    totalOrders: 0,
+    totalRevenue: 0,
+    pendingOrders: 0,
+    lowStockProducts: 0,
+  },
+
   recentOrders: [],
+
   monthlySales: [],
 
-  loadingStats: false,
-  loadingOrders: false,
-  loadingSales: false,
+  loading: false,
+  recentOrdersLoading: false,
+  monthlySalesLoading: false,
 
-  statsError: null,
-  ordersError: null,
-  salesError: null,
+  error: null,
+  recentOrdersError: null,
+  monthlySalesError: null,
 };
 
-// ==========================================
+// ======================================================
 // SLICE
-// ==========================================
+// ======================================================
 
 const adminDashboardSlice = createSlice({
   name: "adminDashboard",
@@ -86,80 +98,78 @@ const adminDashboardSlice = createSlice({
 
   reducers: {
     clearDashboardErrors: (state) => {
-      state.statsError = null;
-      state.ordersError = null;
-      state.salesError = null;
+      state.error = null;
+      state.recentOrdersError = null;
+      state.monthlySalesError = null;
     },
   },
 
   extraReducers: (builder) => {
     builder
 
-      // ======================================
-      // STATS
-      // ======================================
+      // ==================================================
+      // DASHBOARD STATS
+      // ==================================================
 
       .addCase(fetchDashboardStats.pending, (state) => {
-        state.loadingStats = true;
-        state.statsError = null;
+        state.loading = true;
+        state.error = null;
       })
 
       .addCase(fetchDashboardStats.fulfilled, (state, action) => {
-        state.loadingStats = false;
-        state.statsError = null;
+        state.loading = false;
 
-        state.stats = action.payload.stats || null;
+        state.stats = action.payload.stats || state.stats;
       })
 
       .addCase(fetchDashboardStats.rejected, (state, action) => {
-        state.loadingStats = false;
+        state.loading = false;
 
-        state.statsError =
-          action.payload || "Failed to fetch dashboard statistics";
+        state.error = action.payload || "Failed to fetch dashboard statistics";
       })
 
-      // ======================================
+      // ==================================================
       // RECENT ORDERS
-      // ======================================
+      // ==================================================
 
       .addCase(fetchRecentOrders.pending, (state) => {
-        state.loadingOrders = true;
-        state.ordersError = null;
+        state.recentOrdersLoading = true;
+        state.recentOrdersError = null;
       })
 
       .addCase(fetchRecentOrders.fulfilled, (state, action) => {
-        state.loadingOrders = false;
-        state.ordersError = null;
+        state.recentOrdersLoading = false;
 
         state.recentOrders = action.payload.orders || [];
       })
 
       .addCase(fetchRecentOrders.rejected, (state, action) => {
-        state.loadingOrders = false;
+        state.recentOrdersLoading = false;
 
-        state.ordersError = action.payload || "Failed to fetch recent orders";
+        state.recentOrdersError =
+          action.payload || "Failed to fetch recent orders";
       })
 
-      // ======================================
+      // ==================================================
       // MONTHLY SALES
-      // ======================================
+      // ==================================================
 
       .addCase(fetchMonthlySales.pending, (state) => {
-        state.loadingSales = true;
-        state.salesError = null;
+        state.monthlySalesLoading = true;
+        state.monthlySalesError = null;
       })
 
       .addCase(fetchMonthlySales.fulfilled, (state, action) => {
-        state.loadingSales = false;
-        state.salesError = null;
+        state.monthlySalesLoading = false;
 
         state.monthlySales = action.payload.sales || [];
       })
 
       .addCase(fetchMonthlySales.rejected, (state, action) => {
-        state.loadingSales = false;
+        state.monthlySalesLoading = false;
 
-        state.salesError = action.payload || "Failed to fetch monthly sales";
+        state.monthlySalesError =
+          action.payload || "Failed to fetch monthly sales";
       });
   },
 });

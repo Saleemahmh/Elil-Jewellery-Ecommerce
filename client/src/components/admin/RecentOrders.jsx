@@ -5,8 +5,11 @@ const statusStyles = {
   Pending:
     "bg-amber-50 text-amber-700",
 
-  Processing:
+  Confirmed:
     "bg-blue-50 text-blue-700",
+
+  Packed:
+    "bg-indigo-50 text-indigo-700",
 
   Shipped:
     "bg-purple-50 text-purple-700",
@@ -169,7 +172,7 @@ const RecentOrders = ({
                   <td className="py-4">
                     <div>
                       <p className="text-sm text-[#341A36]">
-                        {order.user?.name ||
+                        {order.user?.fullName ||
                           "Customer"}
                       </p>
 

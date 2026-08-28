@@ -1,8 +1,8 @@
 import api from "./axios";
 
-// ==========================================
-// DASHBOARD STATS
-// ==========================================
+// ======================================================
+// DASHBOARD STATISTICS
+// ======================================================
 
 export const getDashboardStats = async () => {
   const response = await api.get("/dashboard/stats");
@@ -10,9 +10,9 @@ export const getDashboardStats = async () => {
   return response.data;
 };
 
-// ==========================================
+// ======================================================
 // RECENT ORDERS
-// ==========================================
+// ======================================================
 
 export const getRecentOrders = async () => {
   const response = await api.get("/dashboard/recent-orders");
@@ -20,9 +20,9 @@ export const getRecentOrders = async () => {
   return response.data;
 };
 
-// ==========================================
+// ======================================================
 // MONTHLY SALES
-// ==========================================
+// ======================================================
 
 export const getMonthlySales = async () => {
   const response = await api.get("/dashboard/monthly-sales");
