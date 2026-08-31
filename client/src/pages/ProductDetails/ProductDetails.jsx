@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,8 +22,8 @@ const ProductDetails = () => {
 
   const {
     selectedProduct,
-    loading,
-    error,
+    productLoading,
+    productError,
   } = useSelector((state) => state.products);
 
   // =========================================
@@ -41,7 +42,7 @@ const ProductDetails = () => {
   // LOADING
   // =========================================
 
-  if (loading) {
+  if (productLoading) {
     return (
       <section className="min-h-[70vh] flex items-center justify-center bg-[#F7F2EB]">
         <div className="text-center">
@@ -73,7 +74,7 @@ const ProductDetails = () => {
   // ERROR / PRODUCT NOT FOUND
   // =========================================
 
-  if (error || !product) {
+  if (productError || !product) {
     return (
       <section className="min-h-[70vh] flex items-center justify-center bg-[#F7F2EB] px-6">
         <div className="text-center max-w-md">
@@ -87,7 +88,7 @@ const ProductDetails = () => {
           </h1>
 
           <p className="mt-4 text-[#6D6460]">
-            {error ||
+            {productError ||
               "The product you're looking for may no longer be available."}
           </p>
 
@@ -186,3 +187,4 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
