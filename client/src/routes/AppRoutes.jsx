@@ -29,6 +29,7 @@ import AdminProductEdit from "../pages/Admin/AdminProductEdit.jsx";
 import AdminCategories from "../pages/Admin/AdminCategories.jsx";
 import AdminCustomers from "../pages/Admin/AdminCustomers.jsx";
 import AdminCustomerView from "../pages/Admin/AdminCustomerView.jsx";
+import AdminCollections from "../pages/Admin/AdminCollections.jsx";
 const AppRoutes = () => {
   const dispatch = useDispatch();
 
@@ -64,6 +65,7 @@ const AppRoutes = () => {
           <Route path="/admin/products/new" element={<AdminProductForm />} />
           <Route path="/admin/products/:id/edit" element={<AdminProductEdit />}/>
           <Route path="/admin/categories" element={<AdminCategories />}/> 
+           <Route path="/admin/collections" element={<AdminCollections />}/> 
           <Route path="/admin/customers" element={<AdminCustomers />}/>
           <Route path="/admin/customers/:id" element={<AdminCustomerView />}
 />

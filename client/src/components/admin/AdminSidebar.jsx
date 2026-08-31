@@ -31,6 +31,11 @@ const adminLinks = [
     icon: FiTag,
   },
   {
+    label: "Collections",
+    path: "/admin/collections",
+    icon: FiTag,
+  },
+  {
     label: "Customers",
     path: "/admin/customers",
     icon: FiUsers,

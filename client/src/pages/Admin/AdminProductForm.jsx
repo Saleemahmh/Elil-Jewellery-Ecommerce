@@ -12,6 +12,10 @@ import {
   createProduct,
 } from "../../redux/slices/productSlice";
 
+import {
+  fetchAdminCollections,
+} from "../../redux/slices/adminCollectionSlice";
+
 import api from "../../services/axios";
 
 const AdminProductForm = () => {
@@ -22,11 +26,31 @@ const AdminProductForm = () => {
     (state) => state.products,
   );
 
+  // ======================================================
+  // CATEGORY STATE
+  // ======================================================
+
   const [categories, setCategories] =
     useState([]);
 
   const [categoryLoading, setCategoryLoading] =
     useState(true);
+
+  // ======================================================
+  // COLLECTION STATE
+  // ======================================================
+
+  const {
+    collections,
+    loading: collectionsLoading,
+    error: collectionsError,
+  } = useSelector(
+    (state) => state.adminCollections,
+  );
+
+  // ======================================================
+  // FORM STATE
+  // ======================================================
 
   const [formData, setFormData] = useState({
     name: "",
@@ -35,6 +59,7 @@ const AdminProductForm = () => {
     price: "",
     discountPrice: "",
     category: "",
+    collection: "",
     stock: "",
     featured: false,
     bestSeller: false,
@@ -73,6 +98,23 @@ const AdminProductForm = () => {
 
     loadCategories();
   }, []);
+
+  // ======================================================
+  // FETCH COLLECTIONS
+  // ======================================================
+
+  useEffect(() => {
+    dispatch(fetchAdminCollections());
+  }, [dispatch]);
+
+  // ======================================================
+  // ACTIVE COLLECTIONS
+  // ======================================================
+
+  const activeCollections = collections.filter(
+    (collection) =>
+      collection.status === "active",
+  );
 
   // ======================================================
   // HANDLE INPUT
@@ -177,20 +219,48 @@ const AdminProductForm = () => {
     const data = new FormData();
 
     data.append("name", formData.name);
+
     data.append(
       "shortDescription",
       formData.shortDescription,
     );
+
     data.append(
       "description",
       formData.description,
     );
+
     data.append("price", formData.price);
+
     data.append(
       "discountPrice",
       formData.discountPrice || 0,
     );
-    data.append("category", formData.category);
+
+    data.append(
+      "category",
+      formData.category,
+    );
+
+    // ==================================================
+    // COLLECTION
+    // ==================================================
+
+    /*
+     * Collection is optional.
+     *
+     * If the admin selects a collection, its MongoDB
+     * ObjectId is sent to the backend.
+     *
+     * If "No collection" is selected, we send an
+     * empty value.
+     */
+
+    data.append(
+      "collection",
+      formData.collection || "",
+    );
+
     data.append("stock", formData.stock);
 
     data.append(
@@ -231,11 +301,13 @@ const AdminProductForm = () => {
 
   return (
     <div className="max-w-5xl">
+
       {/* ================================================= */}
       {/* HEADER */}
       {/* ================================================= */}
 
       <div className="mb-8">
+
         <button
           type="button"
           onClick={() =>
@@ -288,6 +360,7 @@ const AdminProductForm = () => {
         onSubmit={handleSubmit}
         className="space-y-6"
       >
+
         {/* ================================================= */}
         {/* BASIC INFORMATION */}
         {/* ================================================= */}
@@ -312,6 +385,7 @@ const AdminProductForm = () => {
           </h2>
 
           <div className="mt-6 grid gap-5">
+
             {/* NAME */}
 
             <div>
@@ -367,6 +441,7 @@ const AdminProductForm = () => {
                 className="admin-input resize-none"
               />
             </div>
+
           </div>
         </section>
 
@@ -394,6 +469,7 @@ const AdminProductForm = () => {
           </h2>
 
           <div className="mt-6 grid gap-5 md:grid-cols-3">
+
             {/* PRICE */}
 
             <div>
@@ -451,11 +527,12 @@ const AdminProductForm = () => {
                 className="admin-input"
               />
             </div>
+
           </div>
         </section>
 
         {/* ================================================= */}
-        {/* CATEGORY */}
+        {/* CATEGORY & COLLECTION */}
         {/* ================================================= */}
 
         <section
@@ -467,6 +544,7 @@ const AdminProductForm = () => {
             p-6
           "
         >
+
           <h2
             className="
               font-[Cinzel]
@@ -474,38 +552,107 @@ const AdminProductForm = () => {
               text-[#341A36]
             "
           >
-            Category
+            Organization
           </h2>
 
-          <div className="mt-6">
-            <label className="mb-2 block text-sm font-medium text-[#341A36]">
-              Product Category
-            </label>
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
 
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              disabled={categoryLoading}
-              required
-              className="admin-input"
-            >
-              <option value="">
-                {categoryLoading
-                  ? "Loading categories..."
-                  : "Select category"}
-              </option>
+            {/* CATEGORY */}
 
-              {categories.map((category) => (
-                <option
-                  key={category._id}
-                  value={category._id}
-                >
-                  {category.name}
+            <div>
+
+              <label className="mb-2 block text-sm font-medium text-[#341A36]">
+                Product Category
+              </label>
+
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                disabled={categoryLoading}
+                required
+                className="admin-input"
+              >
+                <option value="">
+                  {categoryLoading
+                    ? "Loading categories..."
+                    : "Select category"}
                 </option>
-              ))}
-            </select>
+
+                {categories.map((category) => (
+                  <option
+                    key={category._id}
+                    value={category._id}
+                  >
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+
+            </div>
+
+            {/* COLLECTION */}
+
+            <div>
+
+              <label className="mb-2 block text-sm font-medium text-[#341A36]">
+                Collection
+              </label>
+
+              <select
+                name="collection"
+                value={formData.collection}
+                onChange={handleChange}
+                disabled={collectionsLoading}
+                className="admin-input"
+              >
+
+                <option value="">
+                  {collectionsLoading
+                    ? "Loading collections..."
+                    : "No collection"}
+                </option>
+
+                {activeCollections.map(
+                  (collection) => (
+                    <option
+                      key={collection._id}
+                      value={collection._id}
+                    >
+                      {collection.name}
+                    </option>
+                  ),
+                )}
+
+              </select>
+
+              {collectionsError && (
+                <p className="mt-2 text-xs text-red-500">
+                  {collectionsError}
+                </p>
+              )}
+
+              {!collectionsLoading &&
+                !collectionsError &&
+                activeCollections.length === 0 && (
+                  <p className="mt-2 text-xs text-[#8A7985]">
+                    No active collections are available.
+                  </p>
+                )}
+
+              {!collectionsLoading &&
+                activeCollections.length > 0 && (
+                  <p className="mt-2 text-xs text-[#8A7985]">
+                    Assign this product to a collection
+                    such as Kids or another seasonal
+                    collection.
+                  </p>
+                )}
+
+            </div>
+
           </div>
+
         </section>
 
         {/* ================================================= */}
@@ -521,8 +668,11 @@ const AdminProductForm = () => {
             p-6
           "
         >
+
           <div className="flex items-center justify-between">
+
             <div>
+
               <h2
                 className="
                   font-[Cinzel]
@@ -536,14 +686,17 @@ const AdminProductForm = () => {
               <p className="mt-1 text-xs text-[#8A7985]">
                 Upload up to 5 images.
               </p>
+
             </div>
 
             <span className="text-xs text-[#8A7985]">
               {images.length}/5
             </span>
+
           </div>
 
           <div className="mt-6">
+
             <label
               className="
                 flex
@@ -561,6 +714,7 @@ const AdminProductForm = () => {
                 hover:border-[#C7A05A]
               "
             >
+
               <FiUpload className="text-2xl text-[#C7A05A]" />
 
               <span className="mt-3 text-sm font-medium text-[#341A36]">
@@ -579,61 +733,70 @@ const AdminProductForm = () => {
                 disabled={images.length >= 5}
                 className="hidden"
               />
+
             </label>
+
           </div>
 
           {/* PREVIEWS */}
 
           {previews.length > 0 && (
             <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-              {previews.map((preview, index) => (
-                <div
-                  key={preview}
-                  className="
-                    group
-                    relative
-                    aspect-square
-                    overflow-hidden
-                    rounded-xl
-                    border
-                    border-[#E7DED4]
-                    bg-[#F7F2EB]
-                  "
-                >
-                  <img
-                    src={preview}
-                    alt={`Preview ${index + 1}`}
-                    className="h-full w-full object-cover"
-                  />
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      removeImage(index)
-                    }
+              {previews.map(
+                (preview, index) => (
+                  <div
+                    key={preview}
                     className="
-                      absolute
-                      right-2
-                      top-2
-                      flex
-                      h-7
-                      w-7
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-[#341A36]
-                      text-white
-                      opacity-0
-                      transition
-                      group-hover:opacity-100
+                      group
+                      relative
+                      aspect-square
+                      overflow-hidden
+                      rounded-xl
+                      border
+                      border-[#E7DED4]
+                      bg-[#F7F2EB]
                     "
                   >
-                    <FiX />
-                  </button>
-                </div>
-              ))}
+
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        removeImage(index)
+                      }
+                      className="
+                        absolute
+                        right-2
+                        top-2
+                        flex
+                        h-7
+                        w-7
+                        items-center
+                        justify-center
+                        rounded-full
+                        bg-[#341A36]
+                        text-white
+                        opacity-0
+                        transition
+                        group-hover:opacity-100
+                      "
+                    >
+                      <FiX />
+                    </button>
+
+                  </div>
+                ),
+              )}
+
             </div>
           )}
+
         </section>
 
         {/* ================================================= */}
@@ -649,6 +812,7 @@ const AdminProductForm = () => {
             p-6
           "
         >
+
           <h2
             className="
               font-[Cinzel]
@@ -660,6 +824,7 @@ const AdminProductForm = () => {
           </h2>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
+
             {/* FEATURED */}
 
             <label
@@ -674,6 +839,7 @@ const AdminProductForm = () => {
                 p-4
               "
             >
+
               <input
                 type="checkbox"
                 name="featured"
@@ -683,6 +849,7 @@ const AdminProductForm = () => {
               />
 
               <div>
+
                 <p className="text-sm font-medium text-[#341A36]">
                   Featured Product
                 </p>
@@ -690,7 +857,9 @@ const AdminProductForm = () => {
                 <p className="text-xs text-[#8A7985]">
                   Show in featured products.
                 </p>
+
               </div>
+
             </label>
 
             {/* BEST SELLER */}
@@ -707,6 +876,7 @@ const AdminProductForm = () => {
                 p-4
               "
             >
+
               <input
                 type="checkbox"
                 name="bestSeller"
@@ -716,6 +886,7 @@ const AdminProductForm = () => {
               />
 
               <div>
+
                 <p className="text-sm font-medium text-[#341A36]">
                   Best Seller
                 </p>
@@ -723,7 +894,9 @@ const AdminProductForm = () => {
                 <p className="text-xs text-[#8A7985]">
                   Mark this as a best seller.
                 </p>
+
               </div>
+
             </label>
 
             {/* NEW ARRIVAL */}
@@ -740,6 +913,7 @@ const AdminProductForm = () => {
                 p-4
               "
             >
+
               <input
                 type="checkbox"
                 name="newArrival"
@@ -749,6 +923,7 @@ const AdminProductForm = () => {
               />
 
               <div>
+
                 <p className="text-sm font-medium text-[#341A36]">
                   New Arrival
                 </p>
@@ -756,7 +931,9 @@ const AdminProductForm = () => {
                 <p className="text-xs text-[#8A7985]">
                   Mark this as a new arrival.
                 </p>
+
               </div>
+
             </label>
 
             {/* STATUS */}
@@ -769,6 +946,7 @@ const AdminProductForm = () => {
                 p-4
               "
             >
+
               <label className="mb-2 block text-sm font-medium text-[#341A36]">
                 Product Status
               </label>
@@ -779,6 +957,7 @@ const AdminProductForm = () => {
                 onChange={handleChange}
                 className="admin-input"
               >
+
                 <option value="active">
                   Active
                 </option>
@@ -786,9 +965,13 @@ const AdminProductForm = () => {
                 <option value="inactive">
                   Inactive
                 </option>
+
               </select>
+
             </div>
+
           </div>
+
         </section>
 
         {/* ================================================= */}
@@ -796,6 +979,7 @@ const AdminProductForm = () => {
         {/* ================================================= */}
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
           <button
             type="button"
             onClick={() =>
@@ -838,10 +1022,14 @@ const AdminProductForm = () => {
               ? "Creating Product..."
               : "Create Product"}
           </button>
+
         </div>
+
       </form>
+
     </div>
   );
 };
 
 export default AdminProductForm;
+
