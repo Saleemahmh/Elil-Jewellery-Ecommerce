@@ -1,4 +1,5 @@
 import Collection from "../models/collections.js";
+import Product from "../models/product.js";
 
 // ======================================================
 // CREATE COLLECTION

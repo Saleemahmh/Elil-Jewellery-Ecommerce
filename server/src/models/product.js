@@ -46,13 +46,15 @@ const productSchema = new mongoose.Schema(
       required: [true, "Category is required"],
     },
 
-    collections: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Collection",
-        default: null,
-      },
-    ],
+    collections: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Collection",
+        },
+      ],
+      default: [],
+    },
 
     images: [
       {

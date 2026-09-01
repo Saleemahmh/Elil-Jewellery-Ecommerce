@@ -10,11 +10,6 @@ import nodemailer from "nodemailer";
  *   SMTP_USER=youraddress@gmail.com
  *   SMTP_PASS=your-16-character-app-password   (NOT your regular Gmail password)
  *
- * Gmail App Passwords require 2FA enabled on the account first:
- * Google Account → Security → 2-Step Verification → App passwords.
- *
- * Any other SMTP provider (SendGrid, Mailgun, your own domain's mail
- * server, etc.) works the same way — just swap the host/port/creds.
  */
 
 const transporter = nodemailer.createTransport({

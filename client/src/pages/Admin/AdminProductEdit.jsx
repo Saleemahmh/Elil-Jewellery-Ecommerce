@@ -11,6 +11,10 @@ import {
 } from "../../redux/slices/adminProductSlice.js";
 
 import {
+  fetchAdminCollections,
+} from "../../redux/slices/adminCollectionSlice.js";
+
+import {
   fetchCategories,
 } from "../../redux/slices/categorySlice.js";
 
@@ -41,6 +45,16 @@ const AdminProductEdit = () => {
   } = useSelector((state) => state.categories);
 
   // =====================================================
+  // COLLECTION STATE
+  // =====================================================
+
+  const {
+    collections,
+    loading: collectionsLoading,
+    error: collectionsError,
+  } = useSelector((state) => state.adminCollections);
+
+  // =====================================================
   // FORM STATE
   // =====================================================
 
@@ -51,6 +65,7 @@ const AdminProductEdit = () => {
     price: "",
     discountPrice: "",
     category: "",
+    collections: [],
     stock: "",
     featured: false,
     bestSeller: false,
@@ -62,7 +77,7 @@ const AdminProductEdit = () => {
   const [newImages, setNewImages] = useState([]);
 
   // =====================================================
-  // FETCH PRODUCT + CATEGORIES
+  // FETCH PRODUCT + CATEGORIES + COLLECTIONS
   // =====================================================
 
   useEffect(() => {
@@ -71,6 +86,7 @@ const AdminProductEdit = () => {
     }
 
     dispatch(fetchCategories());
+    dispatch(fetchAdminCollections());
   }, [dispatch, id]);
 
   // =====================================================
@@ -80,23 +96,75 @@ const AdminProductEdit = () => {
   useEffect(() => {
     if (!selectedProduct) return;
 
+    // -----------------------------------------------------
+    // CATEGORY
+    // -----------------------------------------------------
+
+    const categoryId =
+      selectedProduct.category?._id ||
+      selectedProduct.category ||
+      "";
+
+
+    let selectedCollectionIds = [];
+
+    if (Array.isArray(selectedProduct.collections)) {
+      selectedCollectionIds = selectedProduct.collections
+        .map((collection) =>
+          typeof collection === "object"
+            ? collection?._id
+            : collection,
+        )
+        .filter(Boolean);
+    } else if (Array.isArray(selectedProduct.collection)) {
+      selectedCollectionIds = selectedProduct.collection
+        .map((collection) =>
+          typeof collection === "object"
+            ? collection?._id
+            : collection,
+        )
+        .filter(Boolean);
+    } else if (selectedProduct.collection) {
+      const collectionId =
+        typeof selectedProduct.collection === "object"
+          ? selectedProduct.collection?._id
+          : selectedProduct.collection;
+
+      if (collectionId) {
+        selectedCollectionIds = [collectionId];
+      }
+    }
+
+    // -----------------------------------------------------
+    // SET FORM
+    // -----------------------------------------------------
+
     setFormData({
       name: selectedProduct.name || "",
+
       shortDescription:
         selectedProduct.shortDescription || "",
+
       description:
         selectedProduct.description || "",
+
       price: selectedProduct.price ?? "",
+
       discountPrice:
         selectedProduct.discountPrice ?? "",
-      category:
-        selectedProduct.category?._id ||
-        selectedProduct.category ||
-        "",
+
+      category: categoryId,
+
+      collections: selectedCollectionIds,
+
       stock: selectedProduct.stock ?? "",
+
       featured: Boolean(selectedProduct.featured),
+
       bestSeller: Boolean(selectedProduct.bestSeller),
+
       newArrival: Boolean(selectedProduct.newArrival),
+
       status: selectedProduct.status || "active",
     });
 
@@ -108,11 +176,11 @@ const AdminProductEdit = () => {
   // =====================================================
 
   const handleChange = (event) => {
-    const { name, value, type, checked } =
-      event.target;
+    const { name, value, type, checked } = event.target;
 
     setFormData((previous) => ({
       ...previous,
+
       [name]:
         type === "checkbox"
           ? checked
@@ -121,11 +189,41 @@ const AdminProductEdit = () => {
   };
 
   // =====================================================
+  // HANDLE COLLECTION CHANGE
+  // =====================================================
+
+  const handleCollectionChange = (collectionId) => {
+    setFormData((previous) => {
+      const alreadySelected =
+        previous.collections.includes(collectionId);
+
+      if (alreadySelected) {
+        return {
+          ...previous,
+          collections: previous.collections.filter(
+            (id) => id !== collectionId,
+          ),
+        };
+      }
+
+      return {
+        ...previous,
+        collections: [
+          ...previous.collections,
+          collectionId,
+        ],
+      };
+    });
+  };
+
+  // =====================================================
   // NEW IMAGES
   // =====================================================
 
   const handleImageChange = (event) => {
-    const files = Array.from(event.target.files || []);
+    const files = Array.from(
+      event.target.files || [],
+    );
 
     if (files.length === 0) return;
 
@@ -142,7 +240,8 @@ const AdminProductEdit = () => {
   const removeExistingImage = (index) => {
     setExistingImages((previous) =>
       previous.filter(
-        (_, imageIndex) => imageIndex !== index,
+        (_, imageIndex) =>
+          imageIndex !== index,
       ),
     );
   };
@@ -154,7 +253,8 @@ const AdminProductEdit = () => {
   const removeNewImage = (index) => {
     setNewImages((previous) =>
       previous.filter(
-        (_, imageIndex) => imageIndex !== index,
+        (_, imageIndex) =>
+          imageIndex !== index,
       ),
     );
   };
@@ -164,16 +264,16 @@ const AdminProductEdit = () => {
   // =====================================================
 
   /*
-   * Only active categories should normally be available
-   * for assigning to a product.
+   * Only active categories are normally available.
    *
    * If the product currently belongs to an inactive
-   * category, we keep that category in the dropdown so
-   * editing the product does not accidentally remove it.
+   * category, we still show that category so editing
+   * the product does not accidentally remove it.
    */
 
   const activeCategories = categories.filter(
-    (category) => category.status === "active",
+    (category) =>
+      category.status === "active",
   );
 
   const selectedCategory = categories.find(
@@ -185,15 +285,37 @@ const AdminProductEdit = () => {
     selectedCategory &&
     selectedCategory.status !== "active";
 
-  const categoryOptions = selectedCategoryIsInactive
-    ? [
-        selectedCategory,
-        ...activeCategories.filter(
-          (category) =>
-            category._id !== selectedCategory._id,
-        ),
-      ]
-    : activeCategories;
+  const categoryOptions =
+    selectedCategoryIsInactive
+      ? [
+          selectedCategory,
+          ...activeCategories.filter(
+            (category) =>
+              category._id !==
+              selectedCategory._id,
+          ),
+        ]
+      : activeCategories;
+
+  // =====================================================
+  // COLLECTION OPTIONS
+  // =====================================================
+
+  /*
+   * IMPORTANT:
+   *
+   * We intentionally DO NOT filter collections here.
+   *
+   * The edit page should show:
+   *
+   * - Active collections
+   * - Inactive collections
+   *
+   * This is especially important when a product already
+   * belongs to an inactive collection.
+   */
+
+  const collectionOptions = collections;
 
   // =====================================================
   // SUBMIT
@@ -203,6 +325,10 @@ const AdminProductEdit = () => {
     event.preventDefault();
 
     const data = new FormData();
+
+    // -----------------------------------------------------
+    // BASIC INFORMATION
+    // -----------------------------------------------------
 
     data.append("name", formData.name);
 
@@ -216,19 +342,52 @@ const AdminProductEdit = () => {
       formData.description,
     );
 
-    data.append("price", formData.price);
+    // -----------------------------------------------------
+    // PRICING
+    // -----------------------------------------------------
+
+    data.append(
+      "price",
+      formData.price,
+    );
 
     data.append(
       "discountPrice",
       formData.discountPrice || 0,
     );
 
+    // -----------------------------------------------------
+    // CATEGORY
+    // -----------------------------------------------------
+
     data.append(
       "category",
       formData.category,
     );
 
-    data.append("stock", formData.stock);
+
+
+    formData.collections.forEach(
+      (collectionId) => {
+        data.append(
+          "collection",
+          collectionId,
+        );
+      },
+    );
+
+    // -----------------------------------------------------
+    // INVENTORY
+    // -----------------------------------------------------
+
+    data.append(
+      "stock",
+      formData.stock,
+    );
+
+    // -----------------------------------------------------
+    // FLAGS
+    // -----------------------------------------------------
 
     data.append(
       "featured",
@@ -250,15 +409,6 @@ const AdminProductEdit = () => {
       formData.status,
     );
 
-    /*
-     * IMPORTANT:
-     *
-     * If new images are selected, the current backend
-     * replaces the existing Cloudinary images.
-     *
-     * Therefore we only send images when the admin
-     * actually selected new ones.
-     */
 
     if (newImages.length > 0) {
       newImages.forEach((image) => {
@@ -266,10 +416,14 @@ const AdminProductEdit = () => {
       });
     }
 
+    // -----------------------------------------------------
+    // UPDATE
+    // -----------------------------------------------------
+
     try {
       await dispatch(
         updateProduct({
-          productId: id,
+          id,
           productData: data,
         }),
       ).unwrap();
@@ -294,7 +448,9 @@ const AdminProductEdit = () => {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 animate-pulse rounded bg-[#F7F2EB]" />
+
         <div className="h-20 animate-pulse rounded-2xl bg-[#F7F2EB]" />
+
         <div className="h-96 animate-pulse rounded-2xl bg-[#F7F2EB]" />
       </div>
     );
@@ -506,104 +662,86 @@ const AdminProductEdit = () => {
               />
             </div>
 
+          </div>
+        </section>
+
+        {/* ================================================= */}
+        {/* ORGANIZATION */}
+        {/* ================================================= */}
+
+        <section
+          className="
+            rounded-2xl
+            border
+            border-[#E7DED4]
+            bg-white
+            p-6
+          "
+        >
+          <h2
+            className="
+              font-[Cinzel]
+              text-xl
+              text-[#341A36]
+            "
+          >
+            Organization
+          </h2>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+
+            {/* ================================================= */}
             {/* CATEGORY */}
+            {/* ================================================= */}
 
             <div>
               <label className="mb-2 block text-sm font-medium text-[#341A36]">
-                Category
+                Product Category
               </label>
 
-              <div className="flex gap-3">
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+                disabled={categoriesLoading}
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-[#E7DED4]
+                  bg-[#FDFBF8]
+                  px-4
+                  py-3
+                  text-sm
+                  text-[#341A36]
+                  outline-none
+                  focus:border-[#C7A05A]
+                  disabled:cursor-not-allowed
+                  disabled:opacity-60
+                "
+              >
+                <option value="">
+                  {categoriesLoading
+                    ? "Loading categories..."
+                    : "Select category"}
+                </option>
 
-                {/* CATEGORY IMAGE */}
+                {categoryOptions.map(
+                  (category) => (
+                    <option
+                      key={category._id}
+                      value={category._id}
+                    >
+                      {category.name}
 
-                {selectedCategory?.image?.url ? (
-                  <div
-                    className="
-                      flex
-                      h-[50px]
-                      w-[50px]
-                      shrink-0
-                      items-center
-                      justify-center
-                      overflow-hidden
-                      rounded-xl
-                      border
-                      border-[#E7DED4]
-                      bg-[#F7F2EB]
-                    "
-                  >
-                    <img
-                      src={selectedCategory.image.url}
-                      alt={selectedCategory.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="
-                      flex
-                      h-[50px]
-                      w-[50px]
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-xl
-                      border
-                      border-[#E7DED4]
-                      bg-[#F7F2EB]
-                      text-xs
-                      text-[#9A8A95]
-                    "
-                  >
-                    —
-                  </div>
+                      {category.status !== "active"
+                        ? " (Inactive)"
+                        : ""}
+                    </option>
+                  ),
                 )}
-
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  required
-                  disabled={categoriesLoading}
-                  className="
-                    w-full
-                    rounded-xl
-                    border
-                    border-[#E7DED4]
-                    bg-[#FDFBF8]
-                    px-4
-                    py-3
-                    text-sm
-                    text-[#341A36]
-                    outline-none
-                    focus:border-[#C7A05A]
-                    disabled:cursor-not-allowed
-                    disabled:opacity-60
-                  "
-                >
-                  <option value="">
-                    {categoriesLoading
-                      ? "Loading categories..."
-                      : "Select a category"}
-                  </option>
-
-                  {categoryOptions.map(
-                    (category) => (
-                      <option
-                        key={category._id}
-                        value={category._id}
-                      >
-                        {category.name}
-                        {category.status !== "active"
-                          ? " (Inactive)"
-                          : ""}
-                      </option>
-                    ),
-                  )}
-                </select>
-
-              </div>
+              </select>
 
               {categoriesError && (
                 <p className="mt-2 text-xs text-red-500">
@@ -621,9 +759,165 @@ const AdminProductEdit = () => {
 
               {selectedCategoryIsInactive && (
                 <p className="mt-2 text-xs text-amber-600">
-                  This product is currently assigned to an
-                  inactive category. You can select an active
-                  category to change it.
+                  This product is currently assigned to
+                  an inactive category. You can select an
+                  active category to change it.
+                </p>
+              )}
+            </div>
+
+            {/* ================================================= */}
+            {/* COLLECTIONS */}
+            {/* ================================================= */}
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#341A36]">
+                Collections
+              </label>
+
+              {collectionsLoading ? (
+                <div
+                  className="
+                    rounded-xl
+                    border
+                    border-[#E7DED4]
+                    bg-[#FDFBF8]
+                    px-4
+                    py-3
+                    text-sm
+                    text-[#8A7985]
+                  "
+                >
+                  Loading collections...
+                </div>
+              ) : collections.length === 0 ? (
+                <div
+                  className="
+                    rounded-xl
+                    border
+                    border-[#E7DED4]
+                    bg-[#FDFBF8]
+                    px-4
+                    py-3
+                    text-sm
+                    text-[#8A7985]
+                  "
+                >
+                  No collections available.
+                </div>
+              ) : (
+                <div
+                  className="
+                    max-h-64
+                    overflow-y-auto
+                    rounded-xl
+                    border
+                    border-[#E7DED4]
+                    bg-[#FDFBF8]
+                    p-3
+                  "
+                >
+                  <div className="space-y-2">
+
+                    {collectionOptions.map(
+                      (collection) => {
+                        const isSelected =
+                          formData.collections.includes(
+                            collection._id,
+                          );
+
+                        const isInactive =
+                          collection.isActive !== true;
+
+                        return (
+                          <label
+                            key={collection._id}
+                            className="
+                              flex
+                              cursor-pointer
+                              items-center
+                              justify-between
+                              rounded-lg
+                              px-3
+                              py-2
+                              transition
+                              hover:bg-[#F7F2EB]
+                            "
+                          >
+                            <div className="flex items-center gap-3">
+
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() =>
+                                  handleCollectionChange(
+                                    collection._id,
+                                  )
+                                }
+                                className="
+                                  h-4
+                                  w-4
+                                  accent-[#C7A05A]
+                                "
+                              />
+
+                              <span
+                                className={`
+                                  text-sm
+                                  ${
+                                    isInactive
+                                      ? "text-[#8A7985]"
+                                      : "text-[#341A36]"
+                                  }
+                                `}
+                              >
+                                {collection.name}
+                              </span>
+
+                            </div>
+
+                            {isInactive && (
+                              <span
+                                className="
+                                  text-xs
+                                  text-amber-600
+                                "
+                              >
+                                Inactive
+                              </span>
+                            )}
+
+                          </label>
+                        );
+                      },
+                    )}
+
+                  </div>
+                </div>
+              )}
+
+              {collectionsError && (
+                <p className="mt-2 text-xs text-red-500">
+                  {collectionsError}
+                </p>
+              )}
+
+              {!collectionsLoading &&
+                !collectionsError &&
+                collections.length > 0 && (
+                  <p className="mt-2 text-xs text-[#8A7985]">
+                    Select one or more collections for
+                    this product.
+                  </p>
+                )}
+
+              {formData.collections.length > 0 && (
+                <p className="mt-2 text-xs text-[#341A36]">
+                  {formData.collections.length}{" "}
+                  {formData.collections.length === 1
+                    ? "collection"
+                    : "collections"}{" "}
+                  selected
                 </p>
               )}
             </div>

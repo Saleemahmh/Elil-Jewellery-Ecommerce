@@ -35,8 +35,7 @@ const AdminCollections = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    featured: false,
-    status: "active",
+    isActive: true,
     image: null,
   });
 
@@ -58,8 +57,7 @@ const AdminCollections = () => {
     setFormData({
       name: "",
       description: "",
-      featured: false,
-      status: "active",
+      isActive: true,
       image: null,
     });
 
@@ -78,8 +76,7 @@ const AdminCollections = () => {
     setFormData({
       name: collection.name || "",
       description: collection.description || "",
-      featured: Boolean(collection.featured),
-      status: collection.status || "active",
+      isActive: Boolean(collection.isActive),
       image: null,
     });
 
@@ -102,8 +99,7 @@ const AdminCollections = () => {
     setFormData({
       name: "",
       description: "",
-      featured: false,
-      status: "active",
+      isActive:true,
       image: null,
     });
   };
@@ -155,8 +151,7 @@ const AdminCollections = () => {
 
       data.append("name", formData.name);
       data.append("description", formData.description);
-      data.append("featured", formData.featured);
-      data.append("status", formData.status);
+      data.append("isActive", formData.isActive);
 
       if (formData.image) {
         data.append("image", formData.image);
@@ -333,10 +328,6 @@ const AdminCollections = () => {
                 </th>
 
                 <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-[#8A7985]">
-                  Featured
-                </th>
-
-                <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-[#8A7985]">
                   Status
                 </th>
 
@@ -410,33 +401,19 @@ const AdminCollections = () => {
                     </p>
                   </td>
 
-                  {/* FEATURED */}
-
-                  <td className="px-6 py-5 text-center">
-                    {collection.featured ? (
-                      <span className="inline-flex rounded-full bg-[#FBF4E5] px-3 py-1 text-xs font-medium text-[#9A762D]">
-                        Featured
-                      </span>
-                    ) : (
-                      <span className="text-sm text-[#A99BA5]">—</span>
-                    )}
-                  </td>
-
                   {/* STATUS */}
 
                   <td className="px-6 py-5 text-center">
-                    <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
-                        collection.status === "active"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {collection.status === "active"
-                        ? "Active"
-                        : "Inactive"}
-                    </span>
-                  </td>
+  <span
+    className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+      collection.isActive
+        ? "bg-green-50 text-green-700"
+        : "bg-gray-100 text-gray-600"
+    }`}
+  >
+    {collection.isActive ? "Active" : "Inactive"}
+  </span>
+</td>
 
                   {/* ACTIONS */}
 
@@ -513,14 +490,14 @@ const AdminCollections = () => {
                 </div>
 
                 <span
-                  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
-                    collection.status === "active"
-                      ? "bg-green-50 text-green-700"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {collection.status === "active" ? "Active" : "Inactive"}
-                </span>
+  className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+    collection.isActive
+      ? "bg-green-50 text-green-700"
+      : "bg-gray-100 text-gray-600"
+  }`}
+>
+  {collection.isActive ? "Active" : "Inactive"}
+</span>
               </div>
 
               {/* IMAGE */}
@@ -547,14 +524,7 @@ const AdminCollections = () => {
               </p>
 
               <div className="mt-4 flex items-center justify-between">
-                {collection.featured ? (
-                  <span className="rounded-full bg-[#FBF4E5] px-3 py-1 text-xs font-medium text-[#9A762D]">
-                    Featured
-                  </span>
-                ) : (
-                  <span />
-                )}
-
+                
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -826,19 +796,7 @@ const AdminCollections = () => {
                 {/* SETTINGS */}
 
                 <div className="mt-5 rounded-xl bg-[#FDFBF8] p-4">
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input
-                      type="checkbox"
-                      name="featured"
-                      checked={formData.featured}
-                      onChange={handleChange}
-                      className="h-4 w-4 accent-[#C7A05A]"
-                    />
-
-                    <span className="text-sm text-[#341A36]">
-                      Featured Collection
-                    </span>
-                  </label>
+                  
 
                   <div className="mt-4">
                     <label className="mb-2 block text-sm font-medium text-[#341A36]">
@@ -846,26 +804,31 @@ const AdminCollections = () => {
                     </label>
 
                     <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
-                      className="
-                        w-full
-                        rounded-xl
-                        border
-                        border-[#E7DED4]
-                        bg-white
-                        px-4
-                        py-3
-                        text-sm
-                        text-[#341A36]
-                        outline-none
-                        focus:border-[#C7A05A]
-                      "
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
+  name="isActive"
+  value={formData.isActive ? "true" : "false"}
+  onChange={(event) =>
+    setFormData((previous) => ({
+      ...previous,
+      isActive: event.target.value === "true",
+    }))
+  }
+  className="
+    w-full
+    rounded-xl
+    border
+    border-[#E7DED4]
+    bg-white
+    px-4
+    py-3
+    text-sm
+    text-[#341A36]
+    outline-none
+    focus:border-[#C7A05A]
+  "
+>
+  <option value="true">Active</option>
+  <option value="false">Inactive</option>
+</select>
                   </div>
                 </div>
 

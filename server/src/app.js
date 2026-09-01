@@ -17,8 +17,8 @@ const app = express();
 
 app.use(
   cors({
-    //origin: "http://localhost:5173",
-    origin: "https://elil-jewellery.onrender.com",
+    origin: "http://localhost:5173",
+    //origin: "https://elil-jewellery.onrender.com",
     credentials: true,
   }),
 );

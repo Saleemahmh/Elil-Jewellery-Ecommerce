@@ -59,7 +59,7 @@ const AdminProductForm = () => {
     price: "",
     discountPrice: "",
     category: "",
-    collection: "",
+    collection: [],
     stock: "",
     featured: false,
     bestSeller: false,
@@ -112,9 +112,8 @@ const AdminProductForm = () => {
   // ======================================================
 
   const activeCollections = collections.filter(
-    (collection) =>
-      collection.status === "active",
-  );
+  (collection) => collection.isActive === true,
+);
 
   // ======================================================
   // HANDLE INPUT
@@ -593,63 +592,71 @@ const AdminProductForm = () => {
 
             {/* COLLECTION */}
 
-            <div>
+            {/* COLLECTIONS */}
 
-              <label className="mb-2 block text-sm font-medium text-[#341A36]">
-                Collection
-              </label>
+<div>
+  <label className="mb-2 block text-sm font-medium text-[#341A36]">
+    Collections
+  </label>
 
-              <select
-                name="collection"
-                value={formData.collection}
-                onChange={handleChange}
-                disabled={collectionsLoading}
-                className="admin-input"
-              >
+  <select
+    name="collections"
+    multiple
+    value={formData.collections}
+    onChange={(event) => {
+      const selectedCollections = Array.from(
+        event.target.selectedOptions,
+        (option) => option.value,
+      );
 
-                <option value="">
-                  {collectionsLoading
-                    ? "Loading collections..."
-                    : "No collection"}
-                </option>
+      setFormData((previous) => ({
+        ...previous,
+        collections: selectedCollections,
+      }));
+    }}
+    disabled={collectionsLoading}
+    className="admin-input min-h-[120px]"
+  >
+    {collectionsLoading ? (
+      <option disabled>
+        Loading collections...
+      </option>
+    ) : activeCollections.length === 0 ? (
+      <option disabled>
+        No active collections available
+      </option>
+    ) : (
+      activeCollections.map((collection) => (
+        <option
+          key={collection._id}
+          value={collection._id}
+        >
+          {collection.name}
+        </option>
+      ))
+    )}
+  </select>
 
-                {activeCollections.map(
-                  (collection) => (
-                    <option
-                      key={collection._id}
-                      value={collection._id}
-                    >
-                      {collection.name}
-                    </option>
-                  ),
-                )}
+  {collectionsError && (
+    <p className="mt-2 text-xs text-red-500">
+      {collectionsError}
+    </p>
+  )}
 
-              </select>
+  {!collectionsLoading &&
+    !collectionsError &&
+    activeCollections.length === 0 && (
+      <p className="mt-2 text-xs text-[#8A7985]">
+        No active collections are available.
+      </p>
+    )}
 
-              {collectionsError && (
-                <p className="mt-2 text-xs text-red-500">
-                  {collectionsError}
-                </p>
-              )}
-
-              {!collectionsLoading &&
-                !collectionsError &&
-                activeCollections.length === 0 && (
-                  <p className="mt-2 text-xs text-[#8A7985]">
-                    No active collections are available.
-                  </p>
-                )}
-
-              {!collectionsLoading &&
-                activeCollections.length > 0 && (
-                  <p className="mt-2 text-xs text-[#8A7985]">
-                    Assign this product to a collection
-                    such as Kids or another seasonal
-                    collection.
-                  </p>
-                )}
-
-            </div>
+  {activeCollections.length > 0 && (
+    <p className="mt-2 text-xs text-[#8A7985]">
+      Hold Ctrl/Cmd to select multiple collections.
+    </p>
+  )}
+</div>
 
           </div>
 

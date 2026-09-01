@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 
 import { fetchCurrentUser } from "../redux/slices/authSlice.js";
 import Home from "../pages/Home/Home.jsx";
-import Unsubscribe from "../components/home/Newsletter/Unsubscribe.jsx"
+import Unsubscribe from "../components/home/Newsletter/Unsubscribe.jsx";
 import MainLayout from "../layouts/MainLayout.jsx";
 import Shop from "../pages/Shop/Shop.jsx";
 import Auth from "../pages/auth/Auth.jsx";
@@ -30,6 +30,8 @@ import AdminCategories from "../pages/Admin/AdminCategories.jsx";
 import AdminCustomers from "../pages/Admin/AdminCustomers.jsx";
 import AdminCustomerView from "../pages/Admin/AdminCustomerView.jsx";
 import AdminCollections from "../pages/Admin/AdminCollections.jsx";
+import Collections from "../pages/Collections/Collections";
+import CollectionDetails from "../pages/Collections/CollectionDetails";
 const AppRoutes = () => {
   const dispatch = useDispatch();
 
@@ -40,7 +42,7 @@ const AppRoutes = () => {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-         <Route path="/unsubscribe/:token" element={<Unsubscribe />} />
+        <Route path="/unsubscribe/:token" element={<Unsubscribe />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/account" element={<AccountDashboard />} />
         <Route path="/login" element={<Auth />} />
@@ -54,6 +56,8 @@ const AppRoutes = () => {
         <Route path="/account/addresses" element={<Addresses />} />
         <Route path="/orders" element={<MyOrders />} />
         <Route path="/orders/:id" element={<OrderDetails />} />
+        <Route path="/collections" element={<Collections />} />
+        <Route path="/collections/:slug" element={<CollectionDetails />} />
       </Route>
       {/*Admin route */}
       <Route element={<AdminRoute />}>
@@ -63,12 +67,14 @@ const AppRoutes = () => {
           <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/products/new" element={<AdminProductForm />} />
-          <Route path="/admin/products/:id/edit" element={<AdminProductEdit />}/>
-          <Route path="/admin/categories" element={<AdminCategories />}/> 
-           <Route path="/admin/collections" element={<AdminCollections />}/> 
-          <Route path="/admin/customers" element={<AdminCustomers />}/>
-          <Route path="/admin/customers/:id" element={<AdminCustomerView />}
-/>
+          <Route
+            path="/admin/products/:id/edit"
+            element={<AdminProductEdit />}
+          />
+          <Route path="/admin/categories" element={<AdminCategories />} />
+          <Route path="/admin/collections" element={<AdminCollections />} />
+          <Route path="/admin/customers" element={<AdminCustomers />} />
+          <Route path="/admin/customers/:id" element={<AdminCustomerView />} />
         </Route>
       </Route>
     </Routes>

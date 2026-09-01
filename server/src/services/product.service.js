@@ -1,5 +1,6 @@
 import Product from "../models/product.js";
 import Wishlist from "../models/wishlist.js";
+import Collection from "../models/collections.js";
 
 export const createProduct = async (productData) => {
   const existingProduct = await Product.findOne({
@@ -44,8 +45,21 @@ export const getAllProducts = async (queryParams, userId = null) => {
     filter.category = category;
   }
   //collection
+  // ======================================================
+  // COLLECTION
+  // ======================================================
+
   if (collection) {
-    filter.collection = collection;
+    const collectionDoc = await Collection.findOne({
+      slug: collection,
+      isActive: true,
+    });
+
+    if (collectionDoc) {
+      filter.collections = collectionDoc._id;
+    } else {
+      filter.collections = null;
+    }
   }
   //featured
 
@@ -113,6 +127,7 @@ export const getAllProducts = async (queryParams, userId = null) => {
   const totalProducts = await Product.countDocuments(filter);
   const products = await Product.find(filter)
     .populate("category")
+    .populate("collections")
     .sort(sortOption)
     .skip(skip)
     .limit(Number(limit));
@@ -137,7 +152,9 @@ export const getAllProducts = async (queryParams, userId = null) => {
 
 //get product id
 export const getProductById = async (id) => {
-  const product = await Product.findById(id).populate("category");
+  const product = await Product.findById(id)
+    .populate("category")
+    .populate("collections");
   if (!product) {
     throw new Error("Product not found");
   }
@@ -145,7 +162,9 @@ export const getProductById = async (id) => {
 };
 // get product by slug
 export const getProductBySlug = async (slug) => {
-  const product = await Product.findOne({ slug }).populate("category");
+  const product = await Product.findOne({ slug })
+    .populate("category")
+    .populate("collections");
 
   if (!product) {
     throw new Error("Product not found");
