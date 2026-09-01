@@ -32,6 +32,7 @@ import AdminCustomerView from "../pages/Admin/AdminCustomerView.jsx";
 import AdminCollections from "../pages/Admin/AdminCollections.jsx";
 import Collections from "../pages/Collections/Collections";
 import CollectionDetails from "../pages/Collections/CollectionDetails";
+import UnderConstruction from "../pages/Underconstruction/UnderConstruction.jsx";
 import About from "../pages/About/About.jsx";
 const AppRoutes = () => {
   const dispatch = useDispatch();
@@ -60,6 +61,7 @@ const AppRoutes = () => {
         <Route path="/collections" element={<Collections />} />
         <Route path="/collections/:slug" element={<CollectionDetails />} />
         <Route path="/about" element={<About />} />
+        <Route path="/under-construction" element={<UnderConstruction />} />
       </Route>
       {/*Admin route */}
       <Route element={<AdminRoute />}>

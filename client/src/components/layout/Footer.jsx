@@ -18,10 +18,10 @@ const quickLinks = [
 ];
 
 const customerCare = [
-  { label: "Shipping Info", to: "/shipping" },
-  { label: "Returns & Exchanges", to: "/returns" },
-  { label: "FAQs", to: "/faq" },
-  { label: "Track Order", to: "/track-order" },
+  { label: "Shipping Info", to: "/under-construction" },
+  { label: "Returns & Exchanges", to: "/under-construction" },
+  { label: "FAQs", to: "/under-construction" },
+  { label: "Track Order", to: "/under-construction" },
 ];
 
 const socialLinks = [
@@ -119,9 +119,11 @@ const Footer = () => {
               <li className="flex items-start gap-3">
                 <FiMapPin className="text-[#C7A05A] mt-0.5 shrink-0" size={16} />
                 <span className="text-[#C9BFC6] text-sm leading-6">
-                  123 Anna Salai, Chennai,
+                 2nd Floor, SY No: 921/1,
                   <br />
-                  Tamil Nadu 600002, India
+                  Nanjundeshwar Nagar
+                  <br />
+                  Hosur,Tamil Nadu 635109, India
                 </span>
               </li>
               <li className="flex items-center gap-3">
@@ -139,7 +141,7 @@ const Footer = () => {
                   href="mailto:hello@elil.com"
                   className="text-[#C9BFC6] text-sm hover:text-[#E6C37A] transition-colors duration-300"
                 >
-                  vys.business@gmail.com
+                  vysbusiness@gmail.com
                 </a>
               </li>
             </ul>
@@ -157,13 +159,13 @@ const Footer = () => {
 
           <div className="flex items-center gap-6">
             <Link
-              to="/privacy-policy"
+              to="/under-construction"
               className="text-[#8F8390] text-xs hover:text-[#E6C37A] transition-colors duration-300"
             >
               Privacy Policy
             </Link>
             <Link
-              to="/terms"
+              to="/under-construction"
               className="text-[#8F8390] text-xs hover:text-[#E6C37A] transition-colors duration-300"
             >
               Terms of Service
