@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
@@ -6,33 +5,27 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const CollectionShowcase = ({
   collection,
+  products = [],
   index = 0,
 }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
-  /*
-   * ----------------------------------------------------
-   * COLLECTION IMAGES
-   * ----------------------------------------------------
-   *
-   * Your collection currently has a single `image`.
-   *
-   * This also supports `images` if you later add
-   * multiple images to your Collection model.
-   */
 
-  const images =
-    collection.images?.length > 0
-      ? collection.images
-      : collection.image
-        ? [collection.image]
-        : [];
+  const images = products
+    .map((product) => product.images?.[0])
+    .filter(Boolean);
 
-  /*
-   * ----------------------------------------------------
-   * IMAGE SLIDESHOW
-   * ----------------------------------------------------
-   */
+  // ====================================================
+  // RESET SLIDESHOW WHEN PRODUCTS CHANGE
+  // ====================================================
+
+  useEffect(() => {
+    setCurrentImage(0);
+  }, [products]);
+
+  // ====================================================
+  // IMAGE SLIDESHOW
+  // ====================================================
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -48,19 +41,9 @@ const CollectionShowcase = ({
     return () => clearInterval(interval);
   }, [images.length]);
 
-  /*
-   * ----------------------------------------------------
-   * ALTERNATING LAYOUT
-   * ----------------------------------------------------
-   *
-   * Even collection:
-   * image left / text right
-   *
-   * Odd collection:
-   * text left / image right
-   */
-
-  const imageLeft = index % 2 === 0;
+  // ====================================================
+  // CURRENT IMAGE
+  // ====================================================
 
   const currentImageData = images[currentImage];
 
@@ -68,6 +51,19 @@ const CollectionShowcase = ({
     typeof currentImageData === "string"
       ? currentImageData
       : currentImageData?.url;
+
+  // ====================================================
+  // ALTERNATING LAYOUT
+  // ====================================================
+  //
+  // Even collection:
+  // image left / text right
+  //
+  // Odd collection:
+  // text left / image right
+  // ====================================================
+
+  const imageLeft = index % 2 === 0;
 
   return (
     <section className="relative overflow-hidden">
@@ -127,7 +123,21 @@ const CollectionShowcase = ({
             )}
           </AnimatePresence>
 
+          {/* ================================================= */}
+          {/* EMPTY COLLECTION FALLBACK */}
+          {/* ================================================= */}
+
+          {!imageUrl && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="px-8 text-center font-[Cinzel] text-lg text-[#8A7985]">
+                Collection coming soon
+              </p>
+            </div>
+          )}
+
+          {/* ================================================= */}
           {/* IMAGE OVERLAY */}
+          {/* ================================================= */}
 
           <div
             className="
@@ -140,7 +150,9 @@ const CollectionShowcase = ({
             "
           />
 
+          {/* ================================================= */}
           {/* SLIDE INDICATORS */}
+          {/* ================================================= */}
 
           {images.length > 1 && (
             <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2">
@@ -185,7 +197,9 @@ const CollectionShowcase = ({
             xl:px-28
           "
         >
+          {/* ================================================= */}
           {/* DECORATIVE GLOW */}
+          {/* ================================================= */}
 
           <div
             className="
@@ -215,7 +229,9 @@ const CollectionShowcase = ({
             "
           />
 
+          {/* ================================================= */}
           {/* CONTENT */}
+          {/* ================================================= */}
 
           <motion.div
             initial={{
@@ -236,7 +252,9 @@ const CollectionShowcase = ({
             }}
             className="relative z-10 max-w-xl"
           >
+            {/* ================================================= */}
             {/* EYEBROW */}
+            {/* ================================================= */}
 
             <div className="mb-8 flex items-center gap-4">
               <span className="h-px w-12 bg-[#C7A05A]" />
@@ -253,7 +271,9 @@ const CollectionShowcase = ({
               </span>
             </div>
 
+            {/* ================================================= */}
             {/* COLLECTION NAME */}
+            {/* ================================================= */}
 
             <h2
               className="
@@ -270,7 +290,9 @@ const CollectionShowcase = ({
               {collection.name}
             </h2>
 
+            {/* ================================================= */}
             {/* GOLD DIVIDER */}
+            {/* ================================================= */}
 
             <div className="my-8 flex items-center gap-3">
               <span className="h-px w-20 bg-[#C7A05A]/70" />
@@ -280,7 +302,9 @@ const CollectionShowcase = ({
               <span className="h-px w-8 bg-[#C7A05A]/40" />
             </div>
 
+            {/* ================================================= */}
             {/* DESCRIPTION */}
+            {/* ================================================= */}
 
             {collection.description && (
               <p
@@ -296,7 +320,9 @@ const CollectionShowcase = ({
               </p>
             )}
 
+            {/* ================================================= */}
             {/* CTA */}
+            {/* ================================================= */}
 
             <Link
               to={`/collections/${collection.slug}`}
@@ -334,7 +360,9 @@ const CollectionShowcase = ({
             </Link>
           </motion.div>
 
+          {/* ================================================= */}
           {/* VERTICAL DECORATIVE LINE */}
+          {/* ================================================= */}
 
           <div
             className="
@@ -359,4 +387,3 @@ const CollectionShowcase = ({
 };
 
 export default CollectionShowcase;
-

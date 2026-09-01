@@ -6,19 +6,7 @@ import EmptyProducts from "./EmptyProducts";
 
 import { fetchProducts } from "../../redux/slices/productSlice";
 
-/**
- * `filters` comes from Shop.jsx (it already passes
- * `<ProductGrid filters={filters} />`) — previously unused here.
- *
- * REMOVED: the old useSearchParams-based self-fetch. It always read
- * an empty URL query string, so it silently fetched page 1 with no
- * filters on every mount/render, racing against Shop.jsx's own
- * (correct, filtered) fetch. That race made "Load More" impossible,
- * since the leftover fetch would just overwrite any appended
- * products a moment later. Shop.jsx's existing effect already
- * handles the initial/filtered fetch — this component now only
- * fetches for pagination (Load More), which it owns directly.
- */
+
 const ProductGrid = ({ filters }) => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);

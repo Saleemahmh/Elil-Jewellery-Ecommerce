@@ -21,8 +21,15 @@ export const createProduct = async (req, res) => {
         ),
       );
     }
+    const collections = req.body.collections
+      ? Array.isArray(req.body.collections)
+        ? req.body.collections
+        : [req.body.collections]
+      : [];
+
     const productData = {
       ...req.body,
+      collections,
       images: uploadedImages,
       slug: slugify(req.body.name, {
         lower: true,
@@ -117,8 +124,15 @@ export const updateProduct = async (req, res) => {
         ),
       );
     }
+    const collections = req.body.collections
+      ? Array.isArray(req.body.collections)
+        ? req.body.collections
+        : [req.body.collections]
+      : [];
+
     const updateData = {
       ...req.body,
+      collections,
     };
 
     if (req.body.name) {

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Product from "../models/product.js";
 import Wishlist from "../models/wishlist.js";
 import Collection from "../models/collections.js";
@@ -50,10 +51,9 @@ export const getAllProducts = async (queryParams, userId = null) => {
   // ======================================================
 
   if (collection) {
-    const collectionDoc = await Collection.findOne({
-      slug: collection,
-      isActive: true,
-    });
+    const collectionDoc = mongoose.Types.ObjectId.isValid(collection)
+      ? await Collection.findById(collection)
+      : await Collection.findOne({ slug: collection });
 
     if (collectionDoc) {
       filter.collections = collectionDoc._id;

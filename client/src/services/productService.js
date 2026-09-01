@@ -4,9 +4,10 @@ import api from "./axios";
 // GET ALL PRODUCTS
 // ======================================================
 
-export const getProducts = async (params = {}) => {
+export const getProducts = async (params = {}, signal) => {
   const response = await api.get("/products", {
     params,
+    signal,
   });
 
   return response.data;

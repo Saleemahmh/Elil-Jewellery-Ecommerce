@@ -3,8 +3,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   getCollections,
   getCollectionBySlug,
+  getCollectionProducts,
 } from "../../services/collectionService";
-
 // ======================================================
 // FETCH COLLECTIONS
 // ======================================================
@@ -40,7 +40,34 @@ export const fetchCollectionBySlug = createAsyncThunk(
     }
   },
 );
+// ======================================================
+// FETCH PRODUCTS FOR ALL COLLECTIONS
+// ======================================================
 
+export const fetchCollectionProducts = createAsyncThunk(
+  "collections/fetchCollectionProducts",
+
+  async (collections, thunkAPI) => {
+    try {
+      const results = await Promise.all(
+        collections.map(async (collection) => {
+          const data = await getCollectionProducts(collection._id);
+
+          return {
+            collectionId: collection._id,
+            products: data.products || [],
+          };
+        }),
+      );
+
+      return results;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to fetch collection products",
+      );
+    }
+  },
+);
 // ======================================================
 // INITIAL STATE
 // ======================================================
@@ -49,11 +76,15 @@ const initialState = {
   collections: [],
   selectedCollection: null,
 
+  productsByCollection: {},
+
   loading: false,
   selectedCollectionLoading: false,
+  collectionProductsLoading: false,
 
   error: null,
   selectedCollectionError: null,
+  collectionProductsError: null,
 };
 
 // ======================================================
@@ -107,6 +138,7 @@ const collectionSlice = createSlice({
       .addCase(fetchCollectionBySlug.pending, (state) => {
         state.selectedCollectionLoading = true;
         state.selectedCollectionError = null;
+        state.selectedCollection = null;
       })
 
       .addCase(fetchCollectionBySlug.fulfilled, (state, action) => {
@@ -120,6 +152,32 @@ const collectionSlice = createSlice({
 
         state.selectedCollectionError =
           action.payload || "Failed to fetch collection";
+      })
+      // ==================================================
+      // FETCH COLLECTION PRODUCTS
+      // ==================================================
+
+      .addCase(fetchCollectionProducts.pending, (state) => {
+        state.collectionProductsLoading = true;
+        state.collectionProductsError = null;
+      })
+
+      .addCase(fetchCollectionProducts.fulfilled, (state, action) => {
+        state.collectionProductsLoading = false;
+        state.collectionProductsError = null;
+
+        state.productsByCollection = {};
+
+        action.payload.forEach(({ collectionId, products }) => {
+          state.productsByCollection[collectionId] = products;
+        });
+      })
+
+      .addCase(fetchCollectionProducts.rejected, (state, action) => {
+        state.collectionProductsLoading = false;
+
+        state.collectionProductsError =
+          action.payload || "Failed to fetch collection products";
       });
   },
 });

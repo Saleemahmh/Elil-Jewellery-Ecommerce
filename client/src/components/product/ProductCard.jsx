@@ -62,22 +62,6 @@ const ProductCard = ({ product }) => {
     (state) => state.cart
   );
 
-  // =========================================
-  // CART ITEMS
-  // =========================================
-
-  /*
-    Depending on your cartSlice structure, the cart
-    may be stored as:
-
-    state.cart.items
-
-    OR:
-
-    state.cart.cart.items
-
-    This handles both structures safely.
-  */
 
   const cartItems =
     cartState?.items ||
@@ -317,6 +301,7 @@ const ProductCard = ({ product }) => {
           <motion.img
             src={imageUrl}
             alt={product.name}
+            loading="lazy"
             whileHover={
               !isOutOfStock
                 ? {

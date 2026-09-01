@@ -370,7 +370,7 @@ const AdminProductEdit = () => {
     formData.collections.forEach(
       (collectionId) => {
         data.append(
-          "collection",
+          "collections",
           collectionId,
         );
       },

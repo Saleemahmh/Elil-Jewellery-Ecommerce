@@ -16,15 +16,17 @@ export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
 
   async (params = {}, thunkAPI) => {
-    // `append` is a UI-only flag for "Load More" — strip it before
-    // it goes out as a query param, but keep it around to tell the
-    // reducer whether to replace or append the results.
     const { append = false, ...queryParams } = params;
 
     try {
-      const data = await getProducts(queryParams);
+      const data = await getProducts(queryParams, thunkAPI.signal);
       return { ...data, append };
     } catch (error) {
+      // Ignore cancelled requests
+      if (error.name === "CanceledError" || error.code === "ERR_CANCELED") {
+        return thunkAPI.rejectWithValue("Request cancelled");
+      }
+
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "Failed to fetch products",
       );
@@ -131,6 +133,7 @@ const initialState = {
   loading: false,
 
   loadingMore: false,
+  activeRequestId: null,
 
   error: null,
 
@@ -138,6 +141,7 @@ const initialState = {
   filters: {
     search: "",
     category: "",
+    collection: "",
     featured: "",
     bestSeller: "",
     newArrival: "",
@@ -190,7 +194,13 @@ const productSlice = createSlice({
 
       state.currentPage = 1;
     },
-
+    clearProducts: (state) => {
+      state.products = [];
+      state.totalProducts = 0;
+      state.totalPages = 1;
+      state.currentPage = 1;
+      state.error = null;
+    },
     // --------------------------------------------------
     // Change page
     // --------------------------------------------------
@@ -212,23 +222,27 @@ const productSlice = createSlice({
       // ------------------------------------------------
 
       .addCase(fetchProducts.pending, (state, action) => {
-        // A "Load More" request shows its own loading state
-        // (loadingMore) instead of the full-page spinner, so the
-        // 10 products already on screen don't disappear while the
-        // next page loads.
+        state.activeRequestId = action.meta.requestId;
+
         if (action.meta.arg?.append) {
           state.loadingMore = true;
         } else {
           state.loading = true;
+          state.products = [];
         }
+
         state.error = null;
       })
-
       // ------------------------------------------------
       // FETCH SUCCESS
       // ------------------------------------------------
 
       .addCase(fetchProducts.fulfilled, (state, action) => {
+        // Ignore an old request that finished after a newer request
+        if (state.activeRequestId !== action.meta.requestId) {
+          return;
+        }
+
         state.loading = false;
         state.loadingMore = false;
 
@@ -239,17 +253,19 @@ const productSlice = createSlice({
           : newProducts;
 
         state.totalProducts = action.payload.totalProducts || 0;
-
         state.totalPages = action.payload.totalPages || 1;
-
         state.currentPage = action.payload.currentPage || 1;
       })
 
       // ------------------------------------------------
       // FETCH FAILED
       // ------------------------------------------------
-
       .addCase(fetchProducts.rejected, (state, action) => {
+        // Ignore an old request that finished after a newer request
+        if (state.activeRequestId !== action.meta.requestId) {
+          return;
+        }
+
         state.loading = false;
         state.loadingMore = false;
 
@@ -365,7 +381,8 @@ const productSlice = createSlice({
 // EXPORT ACTIONS
 // ======================================================
 
-export const { setFilters, clearFilters, setPage } = productSlice.actions;
+export const { setFilters, clearFilters, setPage, clearProducts } =
+  productSlice.actions;
 
 // ======================================================
 // EXPORT REDUCER

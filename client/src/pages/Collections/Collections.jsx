@@ -5,11 +5,9 @@ import { motion } from "framer-motion";
 
 import CollectionShowcase from "../../components/collection/CollectionShowcase";
 
-// IMPORTANT:
-// Replace this import with the thunk name from your
-// existing collectionSlice if it is different.
 import {
   fetchCollections,
+  fetchCollectionProducts,
 } from "../../redux/slices/collectionSlice";
 
 const Collections = () => {
@@ -20,20 +18,30 @@ const Collections = () => {
   // =====================================================
 
   const {
-    collections = [],
-    loading,
-    error,
-  } = useSelector(
-    (state) => state.collections,
-  );
+  collections = [],
+  productsByCollection = {},
+  loading,
+  collectionProductsLoading,
+  error,
+} = useSelector(
+  (state) => state.collections,
+);
 
   // =====================================================
   // FETCH COLLECTIONS
   // =====================================================
 
   useEffect(() => {
-    dispatch(fetchCollections());
-  }, [dispatch]);
+  dispatch(fetchCollections()).then((result) => {
+    if (fetchCollections.fulfilled.match(result)) {
+      dispatch(
+        fetchCollectionProducts(
+          result.payload.collections || [],
+        ),
+      );
+    }
+  });
+}, [dispatch]);
 
   // =====================================================
   // LOADING
@@ -195,6 +203,7 @@ const Collections = () => {
               <CollectionShowcase
                 key={collection._id}
                 collection={collection}
+                products={productsByCollection[collection._id] || []}
                 index={index}
               />
             ))}

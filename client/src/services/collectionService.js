@@ -19,3 +19,17 @@ export const getCollectionBySlug = async (slug) => {
 
   return response.data;
 };
+
+// ======================================================
+// GET PRODUCTS FOR COLLECTION
+// ======================================================
+
+export const getCollectionProducts = async (collectionId) => {
+  const response = await api.get("/products", {
+    params: {
+      collection: collectionId,
+    },
+  });
+
+  return response.data;
+};

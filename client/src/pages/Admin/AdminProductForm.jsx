@@ -59,7 +59,7 @@ const AdminProductForm = () => {
     price: "",
     discountPrice: "",
     category: "",
-    collection: [],
+    collections: [],
     stock: "",
     featured: false,
     bestSeller: false,
@@ -241,24 +241,10 @@ const AdminProductForm = () => {
       formData.category,
     );
 
-    // ==================================================
-    // COLLECTION
-    // ==================================================
 
-    /*
-     * Collection is optional.
-     *
-     * If the admin selects a collection, its MongoDB
-     * ObjectId is sent to the backend.
-     *
-     * If "No collection" is selected, we send an
-     * empty value.
-     */
-
-    data.append(
-      "collection",
-      formData.collection || "",
-    );
+    formData.collections.forEach((collectionId) => {
+  data.append("collections", collectionId);
+});
 
     data.append("stock", formData.stock);
 

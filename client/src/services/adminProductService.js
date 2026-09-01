@@ -40,12 +40,12 @@ export const createAdminProduct = async (productData) => {
 // UPDATE PRODUCT
 // ============================================
 
+// ============================================
+// UPDATE PRODUCT
+// ============================================
+
 export const updateAdminProduct = async (id, productData) => {
-  const response = await api.patch(`/products/${id}`, productData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await api.patch(`/products/${id}`, productData);
 
   return response.data;
 };
