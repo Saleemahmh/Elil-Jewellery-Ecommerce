@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 
 import Container from "../common/Container";
-import ImagePlaceholder from "../common/ImagePlaceholder";
 import ourStoryImage from "../../assets/images/about/our-story.jpg";
 
 const OurStory = () => {
@@ -58,8 +57,6 @@ const OurStory = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            *
-            <ImagePlaceholder label="Photo: founder's workspace or early sketches" />
           </motion.div>
         </div>
       </Container>
