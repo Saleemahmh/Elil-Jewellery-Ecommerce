@@ -19,8 +19,8 @@ const AboutCTA = () => {
           </h2>
 
           <p className="mt-4 text-[#6D6460] leading-7">
-            Explore the full collection and discover jewellery made
-            to become part of your story.
+            Pretty, wearable, easy on the wallet — starting at ₹400.
+            Come find your next favorite piece.
           </p>
 
           <div className="mt-8">

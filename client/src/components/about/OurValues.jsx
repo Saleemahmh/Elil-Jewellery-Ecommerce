@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import {
-  PiLeafBold,
-  PiHandHeartBold,
-  PiDiamondBold,
-  PiRecycleBold,
+  PiSparkleBold,
+  PiShieldCheckBold,
+  PiTagBold,
+  PiPackageBold,
 } from "react-icons/pi";
 
 import Container from "../common/Container";
@@ -12,27 +12,27 @@ import SectionTitle from "../common/SectionTitle";
 const values = [
   {
     id: 1,
-    icon: PiLeafBold,
-    title: "Ethically Sourced",
-    description: "Materials traced back to responsible origins, always.",
+    icon: PiSparkleBold,
+    title: "Trend-Right Designs",
+    description: "New styles, dropped often — never stuck in last season.",
   },
   {
     id: 2,
-    icon: PiHandHeartBold,
-    title: "Handcrafted Excellence",
-    description: "Every piece shaped by hand, not mass-produced.",
+    icon: PiShieldCheckBold,
+    title: "Quality You Can Trust",
+    description: "Every piece checked before it ships, no shortcuts.",
   },
   {
     id: 3,
-    icon: PiDiamondBold,
-    title: "Timeless Design",
-    description: "Made to be worn for decades, not a single season.",
+    icon: PiTagBold,
+    title: "Prices That Make Sense",
+    description: "Good style shouldn't mean an empty wallet.",
   },
   {
     id: 4,
-    icon: PiRecycleBold,
-    title: "Sustainable Packaging",
-    description: "Thoughtful materials, from the piece to the box.",
+    icon: PiPackageBold,
+    title: "Thoughtful Packaging",
+    description: "Feels a little special, every time it arrives.",
   },
 ];
 

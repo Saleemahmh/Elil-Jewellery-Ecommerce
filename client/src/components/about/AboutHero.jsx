@@ -40,17 +40,18 @@ const AboutHero = () => {
           </p>
 
           <h1 className="mt-5 font-[Cinzel] text-white text-4xl lg:text-5xl leading-tight">
-            Crafted with Purpose,
+            Style That Speaks
             <br />
-            Worn with Pride
+            Without Overpricing Itself
           </h1>
 
           <div className="w-16 h-[2px] bg-[#C7A05A] mx-auto mt-6" />
 
           <p className="mt-6 text-white/70 leading-8">
-            Elil began with a simple belief — that jewellery should
-            feel as personal as the moments it's made for. Every
-            piece we craft carries that belief forward.
+            Elil started with a simple idea — that looking good
+            shouldn't come with a steep price tag. Every piece is
+            designed to be worn often, styled your way, and loved
+            without a second thought.
           </p>
         </motion.div>
       </div>

@@ -18,14 +18,15 @@ const FounderQuote = () => {
           className="relative max-w-2xl mx-auto text-center"
         >
           <p className="font-[Cinzel] text-white text-2xl md:text-3xl leading-relaxed">
-            "We don't make jewellery for a moment. We make it for
-            every moment that comes after."
+            "Great style shouldn't be saved for special occasions.
+            We make it for the everyday — because you deserve to
+            feel good in what you wear, any day of the week."
           </p>
 
           <div className="mt-6 w-14 h-[2px] bg-[#C7A05A] mx-auto" />
 
           <p className="mt-6 text-[#C7A05A] text-sm uppercase tracking-[0.25em]">
-            Founder, Elil Jewellery
+            Team Elil
           </p>
         </motion.div>
       </Container>
