@@ -13,12 +13,13 @@ import newsletterRoutes from "./routes/subscriber.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import adminCustomerRoutes from "./routes/adminCustomer.routes.js";
 import collectionRoutes from "./routes/collection.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
 const app = express();
 
 app.use(
   cors({
-    //origin: "http://localhost:5173",
-    origin: "https://elil-jewellery.onrender.com",
+    origin: "http://localhost:5173",
+    //origin: "https://elil-jewellery.onrender.com",
     credentials: true,
   }),
 );
@@ -43,6 +44,7 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/admin/customers", adminCustomerRoutes);
 app.use("/api/collections", collectionRoutes);
+app.use("/api/payments", paymentRoutes);
 //Test Route
 app.get("/", (req, res) => {
   res.json({

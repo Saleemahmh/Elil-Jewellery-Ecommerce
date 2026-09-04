@@ -4,11 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiArrowLeft, FiCheck } from "react-icons/fi";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-
+import {
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+} from "../../services/paymentService";
 import Container from "../../components/common/Container";
 
 import { fetchCart } from "../../redux/slices/cartSlice";
-import { createOrder } from "../../redux/slices/orderSlice";
+
 import { clearCart } from "../../redux/slices/cartSlice";
 
 const Checkout = () => {
@@ -91,7 +94,29 @@ const Checkout = () => {
     },
     0,
   );
+  //Razorpay
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
 
+    const script = document.createElement("script");
+
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+
+    script.onload = () => {
+      resolve(true);
+    };
+
+    script.onerror = () => {
+      resolve(false);
+    };
+
+    document.body.appendChild(script);
+  });
+};
   const shipping = 0;
 
   const total = subtotal + shipping;
@@ -100,39 +125,138 @@ const Checkout = () => {
   // SUBMIT ORDER
   // ============================================
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
 
-    const shippingAddress = {
-      fullName: formData.fullName.trim(),
-      phone: formData.phone.trim(),
-      addressLine1: formData.addressLine1.trim(),
-      addressLine2: formData.addressLine2.trim(),
-      city: formData.city.trim(),
-      state: formData.state.trim(),
-      postalCode: formData.postalCode.trim(),
-      country: formData.country.trim() || "India",
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  const shippingAddress = {
+    fullName: formData.fullName.trim(),
+    phone: formData.phone.trim(),
+    addressLine1: formData.addressLine1.trim(),
+    addressLine2: formData.addressLine2.trim(),
+    city: formData.city.trim(),
+    state: formData.state.trim(),
+    postalCode: formData.postalCode.trim(),
+    country: formData.country.trim() || "India",
+  };
+
+  try {
+    // ============================================
+    // 1. Load Razorpay Checkout
+    // ============================================
+
+    const isLoaded = await loadRazorpayScript();
+
+    if (!isLoaded) {
+      toast.error("Unable to load Razorpay. Please try again.");
+      return;
+    }
+
+    // ============================================
+    // 2. Create Razorpay order on backend
+    // ============================================
+
+    const razorpayResponse = await createRazorpayOrder();
+
+    const razorpayOrder = razorpayResponse.order;
+
+    // ============================================
+    // 3. Open Razorpay Checkout
+    // ============================================
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+
+      amount: razorpayOrder.amount,
+
+      currency: razorpayOrder.currency,
+
+      name: "ELIL Jewellery Store",
+
+      description: "Order Payment",
+
+      order_id: razorpayOrder.id,
+
+      handler: async function (response) {
+        try {
+          // ========================================
+          // 4. Send payment details to backend
+          // ========================================
+
+          const result = await verifyRazorpayPayment({
+            razorpayOrderId:
+              response.razorpay_order_id,
+
+            razorpayPaymentId:
+              response.razorpay_payment_id,
+
+            razorpaySignature:
+              response.razorpay_signature,
+
+            shippingAddress,
+          });
+await dispatch(fetchCart());
+          // ========================================
+          // 5. Payment + order successful
+          // ========================================
+
+          toast.success(
+            "Payment successful! Your order has been placed.",
+          );
+
+          navigate(
+            `/order-success/${result.order._id}`,
+          );
+        } catch (error) {
+          console.error(
+            "Payment verification error:",
+            error,
+          );
+
+          toast.error(
+            error.response?.data?.message ||
+              "Payment verification failed.",
+          );
+        }
+      },
+
+      prefill: {
+        name: shippingAddress.fullName,
+        contact: shippingAddress.phone,
+      },
+
+      notes: {
+        address: `${shippingAddress.addressLine1}, ${shippingAddress.city}`,
+      },
+
+      theme: {
+        color: "#4A294B",
+      },
+
+      modal: {
+        ondismiss: function () {
+          toast("Payment cancelled.", {
+            icon: "ℹ️",
+          });
+        },
+      },
     };
 
-    try {
-      const result = await dispatch(
-        createOrder({
-          shippingAddress,
-          paymentMethod: "COD",
-        }),
-      ).unwrap();
+    const razorpay = new window.Razorpay(options);
 
-      toast.success("Order placed successfully!");
-      dispatch(clearCart());
-      navigate(
-        `/order-success/${result.order._id}`,
-      );
-    } catch (error) {
-      toast.error(
-        error || "Unable to place your order",
-      );
-    }
-  };
+    razorpay.open();
+  } catch (error) {
+    console.error(
+      "Razorpay checkout error:",
+      error,
+    );
+
+    toast.error(
+      error.response?.data?.message ||
+        "Unable to start payment. Please try again.",
+    );
+  }
+};
 
   // ============================================
   // LOADING
@@ -609,59 +733,59 @@ const Checkout = () => {
               </div>
 
               {/* ================================= */}
-              {/* PAYMENT */}
-              {/* ================================= */}
+{/* PAYMENT */}
+{/* ================================= */}
 
-              <div className="mt-10 border-t border-[#E7DED4] pt-8">
+<div className="mt-10 border-t border-[#E7DED4] pt-8">
 
-                <h2 className="font-[Cinzel] text-xl text-[#4A294B]">
-                  Payment Method
-                </h2>
+  <h2 className="font-[Cinzel] text-xl text-[#4A294B]">
+    Payment Method
+  </h2>
 
-                <div
-                  className="
-                    mt-5
-                    rounded-xl
-                    border
-                    border-[#C7A05A]
-                    bg-[#FCF8F4]
-                    p-5
-                  "
-                >
-                  <div className="flex items-start gap-4">
+  <div
+    className="
+      mt-5
+      rounded-xl
+      border
+      border-[#C7A05A]
+      bg-[#FCF8F4]
+      p-5
+    "
+  >
+    <div className="flex items-start gap-4">
 
-                    <div
-                      className="
-                        mt-0.5
-                        flex
-                        h-6
-                        w-6
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-[#4A294B]
-                        text-white
-                      "
-                    >
-                      <FiCheck size={14} />
-                    </div>
+      <div
+        className="
+          mt-0.5
+          flex
+          h-6
+          w-6
+          shrink-0
+          items-center
+          justify-center
+          rounded-full
+          bg-[#4A294B]
+          text-white
+        "
+      >
+        <FiCheck size={14} />
+      </div>
 
-                    <div>
-                      <p className="font-medium text-[#4A294B]">
-                        Cash on Delivery
-                      </p>
+      <div>
+        <p className="font-medium text-[#4A294B]">
+          Online Payment
+        </p>
 
-                      <p className="mt-1 text-xs leading-5 text-[#7A6E68]">
-                        Pay when your order is delivered.
-                      </p>
-                    </div>
+        <p className="mt-1 text-xs leading-5 text-[#7A6E68]">
+          Pay securely using UPI, cards, net banking or wallets.
+        </p>
+      </div>
 
-                  </div>
-                </div>
+    </div>
+  </div>
 
-              </div>
-
-            </div>
+</div>
+</div>
 
             {/* ================================= */}
             {/* ORDER SUMMARY */}
@@ -793,28 +917,26 @@ const Checkout = () => {
               {/* PLACE ORDER */}
 
               <button
-                type="submit"
-                disabled={placingOrder}
-                className="
-                  mt-6
-                  w-full
-                  rounded-xl
-                  bg-[#4A294B]
-                  px-6
-                  py-4
-                  text-sm
-                  font-medium
-                  text-white
-                  hover:bg-[#C7A05A]
-                  disabled:cursor-not-allowed
-                  disabled:opacity-50
-                  transition-colors
-                "
-              >
-                {placingOrder
-                  ? "Placing Order..."
-                  : "Place Order"}
-              </button>
+  type="submit"
+  disabled={cartLoading}
+  className="
+    mt-6
+    w-full
+    rounded-xl
+    bg-[#4A294B]
+    px-6
+    py-4
+    text-sm
+    font-medium
+    text-white
+    hover:bg-[#C7A05A]
+    disabled:cursor-not-allowed
+    disabled:opacity-50
+    transition-colors
+  "
+>
+  Pay ₹ {total.toLocaleString("en-IN")}
+</button>
 
               <p className="mt-4 text-center text-[11px] leading-5 text-[#8A817B]">
                 By placing your order, you agree to our

@@ -5,7 +5,52 @@ import Cart from "../models/cart.js";
 import Product from "../models/product.js";
 
 import { calculateOrderTotals } from "../utils/orderCalculation.js";
+export const prepareOrderData = async (userId, session = null) => {
+  let cartQuery = Cart.findOne({ user: userId }).populate("items.product");
 
+  if (session) {
+    cartQuery = cartQuery.session(session);
+  }
+
+  const cart = await cartQuery;
+
+  if (!cart || cart.items.length === 0) {
+    throw new Error("Cart is empty");
+  }
+
+  const orderItems = [];
+
+  for (const item of cart.items) {
+    const product = item.product;
+
+    if (!product) {
+      throw new Error("Product no longer exists");
+    }
+
+    if (product.stock < item.quantity) {
+      throw new Error(`${product.name} has only ${product.stock} item(s) left`);
+    }
+
+    orderItems.push({
+      product: product._id,
+      name: product.name,
+      image: product.images[0]?.url || "",
+      price: product.discountPrice || product.price,
+      quantity: item.quantity,
+    });
+  }
+
+  const { subtotal, shippingCharge, totalAmount } =
+    calculateOrderTotals(orderItems);
+
+  return {
+    cart,
+    orderItems,
+    subtotal,
+    shippingCharge,
+    totalAmount,
+  };
+};
 // Create Order
 export const createOrder = async (
   userId,
